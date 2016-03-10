@@ -1,0 +1,54 @@
+<div ng-controller="SalidaCtrl">
+  <div class="text-center">
+    <h3><label class="label label-default">Ficheros de Salida: {{distrib.name}}</label></h3>
+  </div>
+  <div class="col-md-12 text-center vert-offset-top-1">
+    <div class="btn-group">
+      <button class="btn btn-default" ng-class="{'btn-primary': d === distrib}" ng-repeat="d in distribuidoras" ng-click="changeDistrib($index)">{{d.alias|uppercase}}</button>
+    </div>
+  </div>
+  <div class="col-md-12 text-center">
+    <div class="btn-group">
+      <button class="btn btn-default" ng-class="{'btn-primary': p === period}" ng-repeat="p in periodos" ng-click="changePeriod($index)">{{p.alias}}</button>
+    </div>
+  </div>
+  <div class="col-md-12 text-center">
+    <div class="btn-group">
+      <label class="btn btn-default disabled">Omitir los siguientes estados</label>
+      <label class="btn btn-default" ng-repeat="(state,value) in omitStates" ng-change="refreshTable()" ng-model="omitStates[state]" uib-btn-checkbox>{{state}}</label>
+    </div>
+  </div>
+  <div class="col-md-12 vert-offset-top-1 vert-offset-bottom-6">
+    <table ng-table="tableParams" class="table" show-filter="true">
+      <tr ng-class="{'green': file.state === 'NO_REQUIERE_ENVIO' ||
+                              file.state === 'FICHERO_ENVIADO_OK' ||
+                              file.state === 'REE_CONFIRMADO_OK',
+                    'red': file.state === 'REE_CONFIRMADO_BAD2' ||
+                              file.state === 'REE_CONFIRMADO_BAD' ||
+                              file.state === 'FICHERO_ENVIADO_ERROR',
+                    'yellow': file.state === 'REE_PDTE_CONFIRMACION'
+                    }" class="animate" ng-repeat="file in $data">
+          <td title="'Nombre'" filter="{'filename': 'text'}" sortable="'filename'">
+              <a ng-href="http://{{serverConfig.host}}:{{serverConfig.port}}/api/file/{{distrib.alias}}/outputFs/{{file.filename}}">{{file.filename}}</a>
+          </td>
+          <td title="'Tipo'" filter="{ 'type': 'text'}" sortable="'type'">
+              {{file.type}}
+          </td>
+          <td title="'Estado'" filter="{'state': 'text'}" sortable="'state'">
+              <span ng-if="file.state !== 'REE_CONFIRMADO_BAD2'">{{file.state}}</span>
+              <a class="" ng-if="file.state === 'REE_CONFIRMADO_BAD2'" ng-href="http://{{serverConfig.host}}:{{serverConfig.port}}/api/file/{{distrib.alias}}/{{distrib.code}}/inputFs/{{file.filename}}.bad2">{{file.state}}</a>
+
+          </td>
+          <td title="'Envio'" filter="{'sendResult': 'text'}" sortable="'sendResult'">
+              {{file.sendResult}}
+          </td>
+          <td title="'Generado por'" filter="{'inputFilename':'text'}" sortable="'inputFilename'">
+              <a ng-href="http://{{serverConfig.host}}:{{serverConfig.port}}/api/file/{{distrib.alias}}/{{distrib.code}}/inputFs/{{file.inputFilename}}">{{file.inputFilename}}</a>
+          </td>
+          <td title="'Fecha de subida'" filter="{ uploadDate: 'text'}" sortable="'uploadDate'">
+              {{file.uploadDate | date:"dd/MM/yyyy 'a las' HH:mm"}}
+          </td>
+      </tr>
+    </table>
+  </div>
+</div>

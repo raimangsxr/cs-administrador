@@ -1,0 +1,20 @@
+<div class="row marketing" ng-controller="RevficherosCtrl">
+  <div class="text-center">
+    Selecciona una fecha:
+    <input type="daterange" class="btn btn-default dropdown-toggle" ng-model="datepicker" ranges="ranges" ng-change="refreshFileTable()" format="DD MMM YYYY" separator="-" />
+    <h3><label class="label label-default">Visualizando desde el {{datepicker.startDate|date:"dd/MM/yyyy"}} hasta el {{datepicker.endDate|date:"dd/MM/yyyy"}}</label></h3>
+  </div>
+  <table ng-table="tableParams" class="table" show-filter="true">
+    <tr class="animate" ng-repeat="file in $data">
+        <td title="'Nombre'" filter="{ fileName: 'text'}" sortable="'fileName'">
+            {{file.fileName}}
+        </td>
+        <td title="'Tipo'" filter="{ fileType: 'text'}" sortable="'fileType'">
+            {{file.fileType}}
+        </td>
+        <td title="'Fecha de creacion'" filter="{ uploadDate: 'text'}" sortable="'uploadDate'">
+            {{file.uploadDate | date:"dd/MM/yyyy 'a las' hh:mm a"}}
+        </td>
+    </tr>
+  </table>
+</div>
