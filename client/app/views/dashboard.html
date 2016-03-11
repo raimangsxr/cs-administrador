@@ -8,18 +8,26 @@
     <button class="btn btn-default" ng-repeat="period in periodos" ng-click="changePeriod($index)">{{period.alias}}</button>
   </div>
   <div class="vert-offset-top-1 col-md-6">
-    <h3 class="text-center">{{period.alias}}: Estado de ficheros</h3>
-    <canvas id="base" class="chart-base" chart-type="stateChartType" chart-colours="stateChartColours"
-      chart-data="stateChartData" chart-labels="stateChartLabels" chart-legend="true">
-    </canvas>
+    <div class="panel panel-default">
+      <div class="panel-heading panel-title text-center"><h5>{{period.alias}}: Estado de ficheros</h5></div>
+      <div class="panel-body">
+        <canvas id="base" class="chart-base" chart-type="stateChartType" chart-colours="stateChartColours"
+          chart-data="stateChartData" chart-labels="stateChartLabels" chart-legend="true">
+        </canvas>
+      </div>
+    </div>
   </div>
 
   <div class="vert-offset-top-1 col-md-6">
-    <h3 class="text-center">{{period.alias}}: Evolución de estados</h3>
-    <canvas id="line" class="chart chart-line" chart-data="evolveStateChartData" chart-colours="evolveStateChartColours"
-      chart-labels="evolveStateChartLabels" chart-legend="true" chart-series="evolveStateChartSeries"
-      chart-click="onClick" >
-    </canvas> 
+    <div class="panel panel-default">
+      <div class="panel-heading panel-title text-center"><h5>{{period.alias}}: Evolución de estados</h5></div>
+      <div class="panel-body">
+        <canvas id="line" class="chart chart-line" chart-data="evolveStateChartData" chart-colours="evolveStateChartColours"
+          chart-labels="evolveStateChartLabels" chart-legend="true" chart-series="evolveStateChartSeries"
+          chart-click="onClick" >
+        </canvas> 
+      </div>
+    </div>    
   </div>
 
   <div class="vert-offset-top-4 col-md-12 vert-offset-bottom-6">
@@ -27,6 +35,7 @@
       <div class="panel panel-default">
         <div class="panel-heading panel-title text-center">Ficheros que requieren atención por distribuidora</div>
         <div class="panel-body">
+          <div class="text-center">En construcción</div>
           <div class="list-group">
             <a href="#/atencion/distrib/{{distrib.codigo}}" class="list-group-item" ng-repeat="distrib in distribArray">{{distrib.nombre}}<span class="badge">{{distrib.reqAtencion}}</span></a>
           </div>
@@ -36,20 +45,15 @@
 
     <div class="col-md-4">
       <div class="panel panel-default">
-        <div class="panel-heading panel-title text-center">Ficheros que requieren atención por tipo</div>
-        <div class="panel-body">
-          <div class="list-group">
-            <!--<a href="#/atencion/tipo/{{typeName}}" class="list-group-item" ng-repeat="(typeName,counter) in typeArrayPanel">{{typeName}}<span class="badge">{{counter}}</span></a>
-            -->
-          </div>
-        </div>
+        <div class="panel-heading panel-title text-center">Últimos ficheros de entrada</div>
+        <div class="panel-body text-center">En construcción</div>
       </div>
     </div>
 
     <div class="col-md-4">
       <div class="panel panel-default">
-        <div class="panel-heading panel-title text-center">Ficheros que requieren atención por lo que sea</div>
-        <div class="panel-body text-center">asdasd asdsda</div>
+        <div class="panel-heading panel-title text-center">Últimas respuestas de REE</div>
+        <div class="panel-body text-center">En construcción</div>
       </div>
     </div>
   </div>
