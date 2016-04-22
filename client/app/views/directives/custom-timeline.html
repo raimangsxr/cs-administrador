@@ -1,0 +1,10 @@
+<div class="panel panel-primary">
+  <div class="panel-heading"><h3 class="panel-title">Timeline: {{filename}}</h3></div>
+  <div class="panel-body timeline">
+    <dl>
+      <dd ng-repeat="auditEntry in data" ng-class-odd="'pos-right clearfix'" ng-class-even="'pos-left clearfix'">
+        <custom-timeline-entry data="auditEntry"></custom-timeline-entry>
+      </dd>
+    </dl>
+  </div>
+</div>

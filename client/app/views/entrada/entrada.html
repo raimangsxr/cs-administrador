@@ -1,104 +1,43 @@
-<div ng-controller="EntradaCtrl">
-  <div class="text-center">
-    <h3><label class="label label-default">Ficheros de Entrada: {{distrib.name}}</label></h3>
+<div class="text-center">
+  <h3><label class="label label-default">Ficheros de Entrada: {{distrib.name}}</label></h3>
+</div>
+<div class="col-md-12 text-center vert-offset-top-1">
+  <div class="btn-group">
+    <button class="btn btn-default" ng-class="{'btn-primary': d === distrib}" ng-repeat="d in distribuidoras" ng-click="changeDistrib($index)">{{d.alias|uppercase}}</button>
   </div>
-  <div class="col-md-12 text-center vert-offset-top-1">
-    <div class="btn-group">
-      <button class="btn btn-default" ng-class="{'btn-primary': d === distrib}" ng-repeat="d in distribuidoras" ng-click="changeDistrib($index)">{{d.alias|uppercase}}</button>
-    </div>
+</div>
+<div class="col-md-12 text-center">
+  <div class="btn-group">
+    <button class="btn btn-default" ng-class="{'btn-primary': p === period}" ng-repeat="p in periodos" ng-click="changePeriod($index)">{{p.alias}}</button>
   </div>
-  <div class="col-md-12 text-center">
-    <div class="btn-group">
-      <button class="btn btn-default" ng-class="{'btn-primary': p === period}" ng-repeat="p in periodos" ng-click="changePeriod($index)">{{p.alias}}</button>
-    </div>
+</div>
+<div class="col-md-12 text-center">
+  <div class="btn-group">
+    <label class="btn btn-default disabled">Omitir los siguientes tipos</label>
+    <label class="btn btn-default" ng-repeat="(state,value) in omitTypes" ng-change="refreshTable()" ng-model="omitTypes[state]" uib-btn-checkbox>{{state}}</label>
   </div>
-  <div class="col-md-12 text-center">
-    <div class="btn-group">
-      <label class="btn btn-default disabled">Omitir los siguientes tipos</label>
-      <label class="btn btn-default" ng-repeat="(state,value) in omitTypes" ng-change="refreshTable()" ng-model="omitTypes[state]" uib-btn-checkbox>{{state}}</label>
-    </div>
-  </div>
-  <div class="col-md-12 vert-offset-top-2 vert-offset-bottom-6">
-    <div class="col-md-7" id="tableDiv">
-      <div class="panel panel-primary">
-        <div class="panel-heading"><h3 class="panel-title">Registro de entrada</h3></div>
-        <div class="panel-body">
-          <table ng-table="tableParams" class="table" show-filter="true">
-            <tr ng-click="selectFile(file, $index)" ng-class="{selected: $index === idSelectedFile}" class="animate" ng-repeat="file in $data">
-              <td title="'Nombre'" filter="{'filename': 'text'}" sortable="'filename'">
-                  <a ng-href="http://{{serverConfig.host}}:{{serverConfig.port}}/api/file/{{distrib.alias}}/{{distrib.code}}/inputFs/{{file.filename}}">{{file.filename}}</a>
-              </td>
-              <!--
-              <td title="'Tipo'" filter="{ 'type': 'text'}" sortable="'type'">
-                  {{file.type | uppercase}}
-              </td>
-              <td title="'Emisor'" filter="{ 'sourceParticipant': 'text'}" sortable="'sourceParticipant'">
-                  {{file.sourceParticipant | uppercase}}
-              </td>
-              -->
-              <td title="'Fecha'" filter="{ uploadDate: 'text'}" sortable="'uploadDate'">
-                  {{file.uploadDate | date:"dd/MM/yyyy 'a las' HH:mm"}}
-              </td>
-            </tr>
-          </table>
-        </div>
-      </div>
-    </div>
-  
-    <div ng-show="idSelectedFile >= 0" class="col-md-5">
-      <div class="panel panel-primary">
-        <div class="panel-heading"><h3 class="panel-title">Linea de tiempo del fichero seleccionado</h3></div>
-        <div class="panel-body timeline">
-          <dl>
-            <dt>Abril 2015</dt>
-            <dd class="pos-right clearfix">
-                <div class="circ"></div>
-                <div class="time">14 de Abril</div>
-                <div class="events">
-                    <div class="events-body">
-                        <h4 class="events-heading">Estado X</h4>
-                        <p><small class="text-muted"><i class="glyphicon glyphicon-time"></i> hace 11 horas</small></p>
-                        <p>Raw denim you probably haven't heard of them jean shorts Austin. Nesciunt tofu stumptown aliqua.</p>
-                    </div>
-                </div>
-            </dd>
-            <dd class="pos-left clearfix">
-                <div class="circ"></div>
-                <div class="time">10 de Abril</div>
-                <div class="events">
-                    <div class="events-body">
-                        <h4 class="events-heading">Cambia a estado Y</h4>
-                        <p><small class="text-muted"><i class="glyphicon glyphicon-time"></i> hace 4 días</small></p>
-                        <p>Raw denim you probably haven't heard of them jean shorts Austin. Nesciunt tofu stumptown aliqua.</p>
-                    </div>
-                </div>
-            </dd>
-            <dt>Marzo 2015</dt>
-            <dd class="pos-right clearfix">
-                <div class="circ"></div>
-                <div class="time">15 de Marzo</div>
-                <div class="events">
-                    <div class="events-body">
-                        <h4 class="events-heading">Flat UI</h4>
-                        <p><small class="text-muted"><i class="glyphicon glyphicon-time"></i> hace X días</small></p>
-                        <p>Raw denim you probably haven't heard of them jean shorts Austin. Nesciunt tofu stumptown aliqua.</p>
-                    </div>
-                </div>
-            </dd>
-            <dd class="pos-left clearfix">
-                <div class="circ"></div>
-                <div class="time">8 de Marzo</div>
-                <div class="events">
-                    <div class="events-body">
-                        <h4 class="events-heading">UI design</h4>
-                        <p><small class="text-muted"><i class="glyphicon glyphicon-time"></i> hace XX días</small></p>
-                        <p>Raw denim you probably haven't heard of them jean shorts Austin. Nesciunt tofu stumptown aliqua.</p>
-                    </div>
-                </div>
-            </dd>
-
-          </dl>
-        </div>
+</div>
+<div class="col-md-12 vert-offset-top-2 vert-offset-bottom-6">
+  <div id="tableDiv">
+    <div class="panel panel-primary">
+      <div class="panel-heading"><h3 class="panel-title">Registro de entrada</h3></div>
+      <div class="panel-body">
+        <table ng-table="tableParams" class="table" show-filter="true">
+          <tr ng-click="selectFile(file, $index)" ng-class="{selected: $index === idSelectedFile}" class="animate" ng-repeat="file in $data">
+            <td title="'Nombre'" filter="{'filename': 'text'}" sortable="'filename'">
+                <a ng-href="http://{{serverConfig.host}}:{{serverConfig.port}}/api/file/{{distrib.alias}}/{{distrib.code}}/inputFs/{{file.filename}}">{{file.filename}}</a>
+            </td>
+            <td title="'Tipo'" filter="{ 'type': 'text'}" sortable="'type'">
+                {{file.type | uppercase}}
+            </td>
+            <td title="'Emisor'" filter="{ 'sourceParticipant': 'text'}" sortable="'sourceParticipant'">
+                {{file.sourceParticipant | uppercase}}
+            </td>
+            <td title="'Fecha'" filter="{ uploadDate: 'text'}" sortable="'uploadDate'">
+                {{file.uploadDate | date:"dd/MM/yyyy 'a las' HH:mm"}}
+            </td>
+          </tr>
+        </table>
       </div>
     </div>
   </div>

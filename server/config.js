@@ -1,10 +1,13 @@
 module.exports = {
   /* Servers */
-  dbUser: 'dbadmin',
-  dbPass: 'S1l3nu5',
-  dbIp: '192.168.246.151',
+  dbUser: 'csadmin',
+  dbPass: 'csp455',
+  //dbIp: '192.168.246.151',
+  dbIp: '192.168.0.150',
   dbPort: '27017',
-  
+
+  auditCollectionName: 'entradaAuditoria',
+
   csAdministratorDatabase: 'cs-administrador-database',
 
   /* Directories */
@@ -22,5 +25,5 @@ module.exports = {
   },
   
   /* Compression Files */
-  filesWithoutCompression: ['interobjedistrib', 'bad2']
+  filesWithoutCompression: ['interobjedistrib', 'reinterobjedistrib', 'bad2']
 };

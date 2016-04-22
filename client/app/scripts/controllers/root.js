@@ -10,12 +10,12 @@
 angular.module('meanApp')
   .controller('RootCtrl', function ($rootScope, $window, $cookies) {
 
-    
+
     //$rootScope.serverConfig = {host: '192.168.246.153', port: 9000}
-    
+
     $rootScope.serverConfig = {host: 'localhost', port: 3000}
-    
-  
+
+
     $rootScope.distribuidoras = [
       {alias: 'stacomba', 'code': '0185', 'name': 'Eléctrica de Santa Comba'},
       {alias: 'udesa', 'code': '0111', 'name': 'UDESA'},
@@ -33,21 +33,31 @@ angular.module('meanApp')
     ];
     $rootScope.periodos = [
       {alias: 'Última semana', apiPath:'lastWeek', days:7},
-      {alias: 'Últimas dos semanas', apiPath:'lastTwoWeeks', days:15}
+      {alias: 'Últimas dos semanas', apiPath:'lastTwoWeeks', days:15},
+      {alias: 'Todos los datos', apiPath:'all'}
     ];
-  
+
+    //$rootScope.pollInterval = 2000; // 2 minutes
+
     if(!$rootScope.distrib){
       $rootScope.distrib = $rootScope.distribuidoras[0];
     }
-  
+
     var authData = $cookies.getObject('currentUser');
     if(authData){
       $rootScope.currentUser = authData;
     }
-  
+
     $rootScope.logout = function(){
       delete $rootScope.currentUser;
       $cookies.remove('currentUser');
       $window.location.href = '/';
+    };
+
+    $rootScope.setActive = function(idNewActiveTab){
+      var oldActiveTab = angular.element(document.querySelector("li.active"));
+      oldActiveTab.removeClass('active');
+      var newActiveTab = angular.element(document.querySelector("#"+idNewActiveTab));
+      newActiveTab.addClass('active');
     };
 });

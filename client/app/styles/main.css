@@ -60,9 +60,14 @@ body {
 }
 
 /* Responsive: Portrait tablets and up */
-@media screen and (min-width: 768px) {
+@media screen and (min-width: 1400px) {
   .container {
-    max-width: 1200px;
+    width: 1400px;
+  }
+
+  .modal-huge {
+    width: 1200px;
+    margin: 30px auto;
   }
 
   /* Remove the padding we set earlier */
@@ -90,7 +95,12 @@ body {
 .red, .red a{
   background-color: red;
   color: white;
-  
+
+}
+
+.brown, .brown a{
+  background-color: brown;
+  color: white;
 }
 
 .yellow, .yellow a{
@@ -106,12 +116,16 @@ body {
   color: darkgray;
 }
 
+.brown a:hover{
+  color: darkgray;
+}
+
 .yellow a:hover{
   color: dimgray;
 }
 
 .selected{
-  background-color: lightblue;
+  opacity: 0.8;
 }
 
 

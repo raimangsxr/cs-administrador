@@ -71,6 +71,11 @@ angular
         controller: 'SalidaDetalleCtrl',
         controllerAs: 'salidaDetalle'
       })
+      .when('/audit', {
+        templateUrl: 'views/audit/audit.html',
+        controller: 'AuditCtrl',
+        controllerAs: 'audit'
+      })
       .otherwise({
         redirectTo: '/Login'
       });
@@ -85,6 +90,6 @@ angular
           // not going to #login, we should redirect now
           $location.path( '/login' );
         }
-      }         
+      }
     });
   });

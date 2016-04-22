@@ -9,40 +9,52 @@ var GridFSBucket = mongo.GridFSBucket;
 
 /* GET Output file from GridFS. */
 router.get('/:distribAlias/outputFs/:filename', function(req, res) {
-  
-  MongoClient.connect('mongodb://'+config.dbUser+':'+config.dbPass+'@'+config.dbIp+':'+config.dbPort+'/'+req.params.distribAlias+'-database?authSource=admin', function(err, db) {
-    console.log('Retrieve from OutputFS: ' + config.csOutputFilesRoot + req.params.filename);
-    var bucket = new GridFSBucket(db, { bucketName: 'outputFs' });
-    var downloadStream = bucket.openDownloadStreamByName(config.csOutputFilesRoot + req.params.filename);
-    downloadStream.on('error', function(err) {
-      console.log(err);
+  try{
+    MongoClient.connect('mongodb://'+config.dbUser+':'+config.dbPass+'@'+config.dbIp+':'+config.dbPort+'/'
+        +req.params.distribAlias+'-database?authSource='+req.params.distribAlias+'-database',
+        function(err, db) {
+      console.log('Retrieve from OutputFS: ' + config.csOutputFilesRoot + req.params.filename);
+      var bucket = new GridFSBucket(db, { bucketName: 'outputFs' });
+      var downloadStream = bucket.openDownloadStreamByName(config.csOutputFilesRoot + req.params.filename);
+      downloadStream.on('error', function(err) {
+        console.log(err);
+      });
+      res.setHeader('Content-Type', 'application/octet-stream');
+      if(hasFileCompression(req.params.filename))
+        downloadStream.pipe(bz2()).pipe(res);
+      else
+        downloadStream.pipe(res);
     });
-    res.setHeader('Content-Type', 'application/octet-stream');
-    if(hasFileCompression(req.params.filename))
-      downloadStream.pipe(bz2()).pipe(res);
-    else
-      downloadStream.pipe(res);
-  });
+  } catch (error){
+    console.error(error);
+    res.status(500).send(error);
+  }
 });
 
 
 /* GET Input file from GridFS. */
 router.get('/:distribAlias/:distribCode/inputFs/:filename', function(req, res) {
-  
-  var absolutePath = getAbsolutePathInputFs(req.params.distribCode, req.params.filename);
-  MongoClient.connect('mongodb://'+config.dbUser+':'+config.dbPass+'@'+config.dbIp+':'+config.dbPort+'/'+req.params.distribAlias+'-database?authSource=admin', function(err, db) {
-    console.log('Retrieve from InputFS: ' + absolutePath + req.params.filename);
-    var bucket = new GridFSBucket(db, { bucketName: 'inputFs' });
-    var downloadStream = bucket.openDownloadStreamByName(absolutePath + req.params.filename);
-    downloadStream.on('error', function(err) {
-      console.log(err);
+  try{
+    var absolutePath = getAbsolutePathInputFs(req.params.distribCode, req.params.filename);
+    MongoClient.connect('mongodb://'+config.dbUser+':'+config.dbPass+'@'+config.dbIp+':'+config.dbPort+'/'
+        +req.params.distribAlias+'-database?authSource='+req.params.distribAlias+'-database',
+        function(err, db) {
+      console.log('Retrieve from InputFS: ' + absolutePath + req.params.filename);
+      var bucket = new GridFSBucket(db, { bucketName: 'inputFs' });
+      var downloadStream = bucket.openDownloadStreamByName(absolutePath + req.params.filename);
+      downloadStream.on('error', function(err) {
+        console.log(err);
+      });
+      res.setHeader('Content-Type', 'application/octet-stream');
+      if(hasFileCompression(req.params.filename))
+        downloadStream.pipe(bz2()).pipe(res);
+      else
+        downloadStream.pipe(res);
     });
-    res.setHeader('Content-Type', 'application/octet-stream');
-    if(hasFileCompression(req.params.filename))
-      downloadStream.pipe(bz2()).pipe(res);
-    else
-      downloadStream.pipe(res);
-  });
+  } catch (error){
+    console.error(error);
+    res.status(500).send(error);
+  }
 });
 
 
