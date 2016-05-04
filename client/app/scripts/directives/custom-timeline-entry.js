@@ -6,7 +6,7 @@
 angular.module('meanApp').directive('customTimelineEntry', function(){
   return {
     restrict: 'E',
-    templateUrl: '/views/directives/custom-timeline-entry.html',
+    templateUrl: 'views/directives/custom-timeline-entry.html',
     scope: {
       data: '='
     }

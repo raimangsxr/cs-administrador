@@ -4,7 +4,9 @@
   <div class="events-body">
     <p class="events-heading" title="{{data.inputState}}">{{data.inputState}}</p>
     <!--<p><small class="text-muted"><i class="glyphicon glyphicon-time"></i> hace 11 horas</small></p>-->
-    <p ng-if="data.stateForcedBy">Estado forzado por {{data.stateForcedBy}}</p>
-    <p>{{data.errorMsg}}</p>
+    <p ng-if="data.errorMsg" class="alert alert-danger">{{data.errorMsg}}</p>
+    <p ng-if="data.stateForcedBy">Forzado por: {{data.stateForcedBy}}</p>
+    <p ng-if="data.comment" class="alert alert-info">{{data.comment}}</p>
+
   </div>
 </div>

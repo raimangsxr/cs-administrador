@@ -29,21 +29,21 @@
                     'yellow': file.state === 'REE_PDTE_CONFIRMACION'
                     }" class="animate" ng-repeat="file in $data">
           <td title="'Nombre'" filter="{'filename': 'text'}" sortable="'filename'">
-              <a ng-href="http://{{serverConfig.host}}:{{serverConfig.port}}/api/file/{{distrib.alias}}/outputFs/{{file.filename}}">{{file.filename}}</a>
+              <a ng-href="http://{{serverConfig.host}}:{{serverConfig.port}}/api/file/{{distrib.alias}}/{{distrib.code}}/{{file.filename}}">{{file.filename}}</a>
           </td>
           <td title="'Tipo'" filter="{ 'type': 'text'}" sortable="'type'">
               {{file.type}}
           </td>
           <td title="'Estado'" filter="{'state': 'text'}" sortable="'state'">
               <span ng-if="file.state !== 'REE_CONFIRMADO_BAD2'">{{file.state}}</span>
-              <a class="" ng-if="file.state === 'REE_CONFIRMADO_BAD2'" ng-href="http://{{serverConfig.host}}:{{serverConfig.port}}/api/file/{{distrib.alias}}/{{distrib.code}}/inputFs/{{file.filename}}.bad2">{{file.state}}</a>
+              <a class="" ng-if="file.state === 'REE_CONFIRMADO_BAD2'" ng-href="http://{{serverConfig.host}}:{{serverConfig.port}}/api/file/{{distrib.alias}}/{{distrib.code}}/{{file.filename}}.bad2">{{file.state}}</a>
 
           </td>
           <td title="'Envio'" filter="{'sendResult': 'text'}" sortable="'sendResult'">
               {{file.sendResult}}
           </td>
           <td title="'Generado por'" filter="{'inputFilename':'text'}" sortable="'inputFilename'">
-              <a ng-href="http://{{serverConfig.host}}:{{serverConfig.port}}/api/file/{{distrib.alias}}/{{distrib.code}}/inputFs/{{file.inputFilename}}">{{file.inputFilename}}</a>
+              <a ng-href="http://{{serverConfig.host}}:{{serverConfig.port}}/api/file/{{distrib.alias}}/{{distrib.code}}/{{file.inputFilename}}">{{file.inputFilename}}</a>
           </td>
           <td title="'Fecha de subida'" filter="{ uploadDate: 'text'}" sortable="'uploadDate'">
               {{file.uploadDate | date:"dd/MM/yyyy 'a las' HH:mm"}}

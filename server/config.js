@@ -15,15 +15,27 @@ module.exports = {
   csOutputFilesRoot: '/tmp/',
   
   relativeInputDirectories: {
-    cierres: '/CS-entrada/cierres/',
-    curvas: '/CS-entrada/curvas/',
-    'cambios-inv': '/CS-entrada/inventario/',
+    reinterobjedistrib: '/CS-entrada/respuestas-REE-objeciones/',
     inv: '/CS-entrada/inventario/',
-    interobjedistrib: '/CS-entrada/respuestas-REE-objeciones/',
-    aobjeagcl: '/CS-entrada/',
-    bad2: '/CS-entrada/'
+    'cambios-inv': '/CS-entrada/inventario/',
+    curvas: '/CS-entrada/curvas/',
+    cierres: '/CS-entrada/cierres/'
   },
+
+  REEInputDir: 'REE/CS-entrada/',
+  REEInputFileTypes: [
+    'autobjeinme',
+    'autobjeagcl',
+    'aobjeinme',
+    'aobjeagcl',
+    'arevac',
+    'bad2'
+  ],
   
   /* Compression Files */
-  filesWithoutCompression: ['interobjedistrib', 'reinterobjedistrib', 'bad2']
+  filesWithoutCompression: [
+    'interobjedistrib',
+    'reinterobjedistrib',
+    'bad2'
+  ]
 };

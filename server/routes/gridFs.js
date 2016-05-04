@@ -7,57 +7,49 @@ var MongoClient = mongo.MongoClient;
 var GridFSBucket = mongo.GridFSBucket;
 
 
-/* GET Output file from GridFS. */
-router.get('/:distribAlias/outputFs/:filename', function(req, res) {
-  try{
-    MongoClient.connect('mongodb://'+config.dbUser+':'+config.dbPass+'@'+config.dbIp+':'+config.dbPort+'/'
-        +req.params.distribAlias+'-database?authSource='+req.params.distribAlias+'-database',
-        function(err, db) {
-      console.log('Retrieve from OutputFS: ' + config.csOutputFilesRoot + req.params.filename);
-      var bucket = new GridFSBucket(db, { bucketName: 'outputFs' });
-      var downloadStream = bucket.openDownloadStreamByName(config.csOutputFilesRoot + req.params.filename);
-      downloadStream.on('error', function(err) {
-        console.log(err);
-      });
-      res.setHeader('Content-Type', 'application/octet-stream');
-      if(hasFileCompression(req.params.filename))
-        downloadStream.pipe(bz2()).pipe(res);
-      else
-        downloadStream.pipe(res);
-    });
-  } catch (error){
-    console.error(error);
-    res.status(500).send(error);
-  }
-});
-
-
-/* GET Input file from GridFS. */
-router.get('/:distribAlias/:distribCode/inputFs/:filename', function(req, res) {
+router.get('/:distribAlias/:distribCode/:filename', function(req, res) {
   try{
     var absolutePath = getAbsolutePathInputFs(req.params.distribCode, req.params.filename);
     MongoClient.connect('mongodb://'+config.dbUser+':'+config.dbPass+'@'+config.dbIp+':'+config.dbPort+'/'
         +req.params.distribAlias+'-database?authSource='+req.params.distribAlias+'-database',
         function(err, db) {
-      console.log('Retrieve from InputFS: ' + absolutePath + req.params.filename);
-      var bucket = new GridFSBucket(db, { bucketName: 'inputFs' });
-      var downloadStream = bucket.openDownloadStreamByName(absolutePath + req.params.filename);
-      downloadStream.on('error', function(err) {
-        console.log(err);
-      });
-      res.setHeader('Content-Type', 'application/octet-stream');
-      if(hasFileCompression(req.params.filename))
-        downloadStream.pipe(bz2()).pipe(res);
-      else
-        downloadStream.pipe(res);
-    });
+          var bucket = new GridFSBucket(db, { bucketName: 'inputFs' });
+          var downloadStream = bucket.openDownloadStreamByName(absolutePath + req.params.filename);
+          downloadStream.on('error', function(err) {
+            var errorType = err.message.split(':')[0];
+            if (!errorType === 'FileNotFound') {
+              console.error(err.message);
+              res.status(500).send(err.message);
+            }
+            bucket = new GridFSBucket(db, { bucketName: 'outputFs' });
+            downloadStream = bucket.openDownloadStreamByName(config.csOutputFilesRoot + req.params.filename);
+            downloadStream.on('error', function(err) {
+              console.error(err.message);
+              var errorType = err.message.split(':')[0];
+              if (errorType === 'FileNotFound')
+                res.status(404).send(err.message);
+              else
+                res.status(500).send(err.message);
+            });
+            console.log('Retrieve from OutputFS: ' + config.csOutputFilesRoot + req.params.filename);
+            res.setHeader('Content-Type', 'application/octet-stream');
+            if(hasFileCompression(req.params.filename))
+              downloadStream.pipe(bz2()).pipe(res);
+            else
+              downloadStream.pipe(res);
+          });
+          console.log('Retrieve from InputFS: ' + absolutePath + req.params.filename);
+          res.setHeader('Content-Type', 'application/octet-stream');
+          if(hasFileCompression(req.params.filename))
+            downloadStream.pipe(bz2()).pipe(res);
+          else
+            downloadStream.pipe(res);
+        });
   } catch (error){
     console.error(error);
     res.status(500).send(error);
   }
 });
-
-
 
 
 
@@ -70,8 +62,9 @@ function getAbsolutePathInputFs(distribCode, filename){
   var fileTokensUnderscore = filename.toLowerCase().split('_');
   var fileTokensDot = filename.toLowerCase().split('.');
   
-  if(fileTokensDot[2] === 'bad2') // is a BAD2 file
-    absolutePath = absolutePath + 'REE' + config.relativeInputDirectories.bad2;
+  if( (config.REEInputFileTypes.indexOf(fileTokensUnderscore[0]) >= 0) // by file type (until first underscore)
+      || (config.REEInputFileTypes.indexOf(fileTokensDot[2]) >= 0) ) // by file extension
+    absolutePath = absolutePath + config.REEInputDir;
   else // by Type of file
     absolutePath = absolutePath + distribCode + config.relativeInputDirectories[fileTokensUnderscore[0]];
   

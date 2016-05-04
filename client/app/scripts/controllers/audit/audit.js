@@ -40,18 +40,17 @@ angular.module('meanApp')
       ACUMAGREREOS2: true
     };
 
-    $scope.idSelectedFile = null;
+    // Can omit Types
+    $scope.omitInputStates = {
+      PROCESADO_COMPLETADO: false,
+      DUPLICADO: false,
+      REVISADO: false
+    };
 
-    //$scope.distrib = {}; //stacomba
-    $scope.period = $scope.periodos[1]; //15 dias
+    $scope.idSelectedFile = null;
 
     $scope.changeDistrib = function (index){
       $rootScope.distrib = $rootScope.distribuidoras[index];
-      $scope.refreshTable();
-    };
-
-    $scope.changePeriod = function(index){
-      $scope.period = $scope.periodos[index];
       $scope.refreshTable();
     };
 
@@ -69,10 +68,10 @@ angular.module('meanApp')
 
     $scope.showDetail = function(file, index){
       $scope.selectFile(file, index);
+      $scope.canSetReviewedFile = (file.inputState === 'PROCESADO_INCORRECTO_PDTE_INFORME' || file.inputState === 'PROCESADO_ERROR') ? true : false;
       $http.get('http://'+$rootScope.serverConfig.host+':'+$rootScope.serverConfig.port+'/api/audit/generatedby/'+$rootScope.distrib.alias+'/'+file.filename).then(
         function(response){
           var auditOutputData = response.data;
-          $scope.canSetReviewedFile = canSetReviewed(auditOutputData);
           $scope.detailTableParams = new NgTableParams({
             page: 1,
             count: 10
@@ -91,7 +90,10 @@ angular.module('meanApp')
         function(response){
           var ficheros = response.data;
           ficheros = ficheros.filter(function(file){
-            return !$scope.omitTypes[file.fileType];
+            var filterRevisado = true;
+            if($scope.omitInputStates['REVISADO'])
+              filterRevisado = (file.stateForcedBy !== undefined) ? false : true;
+            return !$scope.omitTypes[file.fileType] && !$scope.omitInputStates[file.inputState] && filterRevisado;
           });
           var filters = {
             filename: document.querySelector('input[name="filename"]').value,
@@ -143,8 +145,10 @@ angular.module('meanApp')
 
     $scope.setReviewed = function(){
       var inputFile = $scope.selectedFile;
+      delete inputFile.errorMsg;
       inputFile.inputState = 'PROCESADO_COMPLETADO';
       inputFile.stateForcedBy = $cookies.getObject('currentUser').username;
+      inputFile.comment = $scope.comment;
       $http.post(
         'http://'+$rootScope.serverConfig.host+':'+$rootScope.serverConfig.port+'/api/audit/'+$rootScope.distrib.alias,
         inputFile
