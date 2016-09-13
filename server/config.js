@@ -11,6 +11,7 @@ module.exports = {
   csAdministratorDatabase: 'cs-administrador-database',
 
   /* Directories */
+  /*
   csInputFilesRoot: '/opt/CS/var/tmp/CS/',
   csOutputFilesRoot: '/tmp/',
   
@@ -31,11 +32,13 @@ module.exports = {
     'arevac',
     'bad2'
   ],
-  
+  */
   /* Compression Files */
   filesWithoutCompression: [
     'interobjedistrib',
     'reinterobjedistrib',
-    'bad2'
+    'bad2',
+    'curvas-telemedida',
+    '15curvas-telemedida',
   ]
 };
