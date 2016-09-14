@@ -26,7 +26,7 @@
                     'red': file.state === 'REE_CONFIRMADO_BAD2' ||
                               file.state === 'REE_CONFIRMADO_BAD' ||
                               file.state === 'FICHERO_ENVIADO_ERROR',
-                    'yellow': file.state === 'REE_PDTE_CONFIRMACION'
+                    'yellow': file.state === 'FICHERO_PDTE_ENVIO'
                     }" class="animate" ng-repeat="file in $data">
           <td title="'Nombre'" filter="{'filename': 'text'}" sortable="'filename'">
               <a ng-href="http://{{serverConfig.host}}:{{serverConfig.port}}/api/file/{{distrib.alias}}/{{distrib.code}}/{{file.filename}}">{{file.filename}}</a>

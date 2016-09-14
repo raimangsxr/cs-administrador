@@ -26,9 +26,13 @@
         <div class="panel-body">
           <table ng-table="tableParams" class="table" show-filter="true">
             <tr ng-click="selectFile(file, $index)" ng-class="{selected: $index === idSelectedFile,
-                      'green': inputStateColors['green'].indexOf(file.inputState) >= 0,
-                      'yellow': inputStateColors['yellow'].indexOf(file.inputState) >= 0,
+                      'green': inputStateColors['green'].indexOf(file.inputState) >= 0
+                              || outputStates['ok'].indexOf(file.outputState) >= 0,
+                      'yellow': inputStateColors['yellow'].indexOf(file.inputState) >= 0
+                              || outputStates['pending'].indexOf(file.outputState) >= 0,
                       'red': inputStateColors['red'].indexOf(file.inputState) >= 0
+                              || outputStates['error'].indexOf(file.outputState) >= 0
+                              || outputStates['bad'].indexOf(file.outputState) >= 0
                     }" class="animate" ng-repeat="file in $data">
               <td title="'Nombre'" filter="{'filename': 'text'}" sortable="'filename'">
                 <a title="{{file.filename}}" ng-href="http://{{serverConfig.host}}:{{serverConfig.port}}/api/file/{{distrib.alias}}/{{distrib.code}}/{{file.filename}}">{{file.filename}}</a>
@@ -42,7 +46,7 @@
                 {{file.creationDate | date:"dd/MM/yyyy 'a las' HH:mm"}}
               </td>
               <td title="'Ops'">
-                <button title="Ver estados de ficheros generados por este fichero" class="btn btn-default" ng-click="showDetail(file, $index); $event.stopPropagation();">Detalle</button>
+                <button ng-if="file.inputState" title="Ver estados de ficheros generados por este fichero" class="btn btn-default" ng-click="showDetail(file, $index); $event.stopPropagation();">Detalle</button>
               </td>
             </tr>
           </table>
