@@ -9,13 +9,14 @@
   </div>
   <div class="col-md-12 text-center">
     <div class="btn-group">
-      <button class="btn btn-default" ng-class="{'btn-primary': p === period}" ng-repeat="p in periodos" ng-click="changePeriod($index)">{{p.alias}}</button>
+      <label class="btn btn-default disabled">Omitir los siguientes tipos</label>
+      <label class="btn btn-default" ng-repeat="(type,value) in omitTypes" ng-change="refreshTable()" ng-model="omitTypes[type]" uib-btn-checkbox>{{type}}</label>
     </div>
   </div>
   <div class="col-md-12 text-center">
     <div class="btn-group">
-      <label class="btn btn-default disabled">Omitir los siguientes tipos</label>
-      <label class="btn btn-default" ng-repeat="(state,value) in omitTypes" ng-change="refreshTable()" ng-model="omitTypes[state]" uib-btn-checkbox>{{state}}</label>
+      <label class="btn btn-default disabled">Omitir los siguientes estados</label>
+      <label class="btn btn-default" ng-repeat="(state,value) in omitInputStates" ng-change="refreshTable()" ng-model="omitInputStates[state]" uib-btn-checkbox>{{state}}</label>
     </div>
   </div>
   <div class="col-md-12 vert-offset-top-2 vert-offset-bottom-6">
@@ -25,18 +26,27 @@
         <div class="panel-body">
           <table ng-table="tableParams" class="table" show-filter="true">
             <tr ng-click="selectFile(file, $index)" ng-class="{selected: $index === idSelectedFile,
-                      'green': inputStateColors['green'].indexOf(file.inputState) >= 0,
-                      'yellow': inputStateColors['yellow'].indexOf(file.inputState) >= 0,
+                      'green': inputStateColors['green'].indexOf(file.inputState) >= 0
+                              || outputStates['ok'].indexOf(file.outputState) >= 0,
+                      'yellow': inputStateColors['yellow'].indexOf(file.inputState) >= 0
+                              || outputStates['pending'].indexOf(file.outputState) >= 0,
                       'red': inputStateColors['red'].indexOf(file.inputState) >= 0
+                              || outputStates['error'].indexOf(file.outputState) >= 0
+                              || outputStates['bad'].indexOf(file.outputState) >= 0
                     }" class="animate" ng-repeat="file in $data">
               <td title="'Nombre'" filter="{'filename': 'text'}" sortable="'filename'">
-                <a title="{{file.filename}}" ng-href="http://{{serverConfig.host}}:{{serverConfig.port}}/api/file/{{distrib.alias}}/{{distrib.code}}/inputFs/{{file.filename}}">{{file.filename}}</a>
+                <a title="{{file.filename}}" ng-href="http://{{serverConfig.host}}:{{serverConfig.port}}/api/file/{{distrib.alias}}/{{distrib.code}}/{{file.filename}}">{{file.filename}}</a>
               </td>
-              <td title="'Últ. Actualización'" filter="{ creationDate: 'text'}" sortable="'creationDate'">
+              <!--
+              <td title="'Tipo'" filter="{'fileType': 'text'}" sortable="'fileType'">
+                {{file.fileType}}
+              </td>
+              -->
+              <td title="'Refresco'" filter="{ creationDate: 'text'}" sortable="'creationDate'">
                 {{file.creationDate | date:"dd/MM/yyyy 'a las' HH:mm"}}
               </td>
-              <td title="'Operaciones'">
-                <button title="Ver estados de ficheros generados por este fichero" class="btn btn-default" ng-click="showDetail(file, $index); $event.stopPropagation();">Detalle</button>
+              <td title="'Ops'">
+                <button ng-if="file.inputState" title="Ver estados de ficheros generados por este fichero" class="btn btn-default" ng-click="showDetail(file, $index); $event.stopPropagation();">Detalle</button>
               </td>
             </tr>
           </table>
@@ -69,14 +79,14 @@
                       'red': outputStates.error.indexOf(file.outputState) >= 0
                     }" class="animate" ng-repeat="file in $data">
                     <td title="'Nombre'" filter="{'filename': 'text'}" sortable="'filename'">
-                      <a ng-href="http://{{serverConfig.host}}:{{serverConfig.port}}/api/file/{{distrib.alias}}/{{distrib.code}}/outputFs/{{file.filename}}">
+                      <a ng-href="http://{{serverConfig.host}}:{{serverConfig.port}}/api/file/{{distrib.alias}}/{{distrib.code}}/{{file.filename}}">
                         {{file.filename}}
                       </a>
                     </td>
                     <td title="'Estado'" filter="{'outputState': 'text'}" sortable="'outputState'">
                       <span ng-if="outputStates.bad.indexOf(file.outputState) < 0">{{file.outputState}}</span>
                       <a class="" ng-if="outputStates.bad.indexOf(file.outputState) >= 0"
-                         ng-href="http://{{serverConfig.host}}:{{serverConfig.port}}/api/file/{{distrib.alias}}/{{distrib.code}}/inputFs/{{file.filename}}.bad2">
+                         ng-href="http://{{serverConfig.host}}:{{serverConfig.port}}/api/file/{{distrib.alias}}/{{distrib.code}}/{{file.filename}}.bad2">
                         {{file.outputState}}
                       </a>
                     </td>
@@ -104,14 +114,20 @@
 
         <!-- Modal content-->
         <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title">¿Estas seguro de marcar como revisado este fichero?</h4>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-primary" data-dismiss="modal">No</button>
-            <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="setReviewed()">Si</button>
-          </div>
+          <form name="review" novalidate>
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4 class="modal-title">Añadir un comentario para forzar esta transición.</h4>
+            </div>
+            <div class="modal-body">
+              <textarea placeholder="Comentario..." name="comment" ng-model="comment" style="min-width: 100%" required></textarea>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+              <button type="button" class="btn btn-default" ng-show="review.comment.$invalid" disabled>Confirmar</button>
+              <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="setReviewed()" ng-show="review.comment.$valid">Confirmar</button>
+            </div>
+          </form>
         </div>
 
       </div>

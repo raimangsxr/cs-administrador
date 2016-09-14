@@ -25,7 +25,7 @@
         <table ng-table="tableParams" class="table" show-filter="true">
           <tr ng-click="selectFile(file, $index)" ng-class="{selected: $index === idSelectedFile}" class="animate" ng-repeat="file in $data">
             <td title="'Nombre'" filter="{'filename': 'text'}" sortable="'filename'">
-                <a ng-href="http://{{serverConfig.host}}:{{serverConfig.port}}/api/file/{{distrib.alias}}/{{distrib.code}}/inputFs/{{file.filename}}">{{file.filename}}</a>
+                <a ng-href="http://{{serverConfig.host}}:{{serverConfig.port}}/api/file/{{distrib.alias}}/{{distrib.code}}/{{file.filename}}">{{file.filename}}</a>
             </td>
             <td title="'Tipo'" filter="{ 'type': 'text'}" sortable="'type'">
                 {{file.type | uppercase}}

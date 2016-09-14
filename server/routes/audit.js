@@ -11,7 +11,11 @@ router.get('/:distrib', function(req, res, next) {
     try{
         var db = mongoskin.db('mongodb://'+config.dbUser+':'+config.dbPass+'@'+config.dbIp+':'+config.dbPort+'/'
             +req.params.distrib+'-database?authSource='+req.params.distrib+'-database', {safe:true});
-        db.collection(config.auditCollectionName).find({active: true, inputState:{$exists:true}},{}).sort({creationDate:-1}).toArray(function(e, results){
+        db.collection(config.auditCollectionName)
+          .find({active: true, $or:[{inputState:{$exists:true}}, {inputFileName:null}] },{})
+          .batchSize(100000)
+          .sort({creationDate:-1})
+          .toArray(function(e, results){
             if (e) return next(e);
             db.close();
             res.send(results);
