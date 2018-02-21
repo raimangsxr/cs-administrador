@@ -92,6 +92,11 @@ body {
   color: white;
 }
 
+.darkgreen, .darkgreen a{
+  background-color: darkgreen;
+  color: white;
+}
+
 .red, .red a{
   background-color: red;
   color: white;
@@ -138,4 +143,13 @@ body {
 
 #logout:hover{
   cursor: pointer;
+}
+
+.filter_row{
+  margin-top: 0.5em;
+}
+
+.fix-to-top {
+  position: fixed;
+  top: 1em;
 }

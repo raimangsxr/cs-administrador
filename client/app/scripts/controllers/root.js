@@ -13,7 +13,7 @@ angular.module('meanApp')
 
     //$rootScope.serverConfig = {host: '192.168.246.153', port: 9000};
 
-    $rootScope.serverConfig = {host: 'localhost', port: 3000};
+    $rootScope.serverConfig = {host: '192.168.234.12', port: 3000};
 
 
     $rootScope.distribuidoras = [

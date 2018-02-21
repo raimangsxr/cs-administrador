@@ -24,14 +24,13 @@ angular.module('meanApp')
 
     // Audit OUTPUT States
     $scope.outputStates = {
-      error : ['REE_DESPUBLICADO_ERROR', 'REE_RECOGIDA_TIMEOUT', 'REE_CONFIRMADO_TIMEOUT', 'REE_CONFIRMADO_TIMEOUT_OK',
-        'REE_CONFIRMADO_TIMEOUT_BAD', 'REE_CONFIRMADO_TIMEOUT_BAD2'],
-      bad : ['REE_CONFIRMADO_BAD', 'REE_CONFIRMADO_BAD2', 'REE_DESPUBLICADO_BAD'],
-      pending: ['REE_PUBLICADO', 'REE_RECOGIDO_PDTE_CONFIRMACION'],
+      error : ['REE_DESPUBLICADO_ERROR', 'REE_RECOGIDA_TIMEOUT', 'REE_CONFIRMADO_TIMEOUT', 'REE_CONFIRMADO_TIMEOUT_OK'],
+      bad : ['REE_CONFIRMADO_BAD', 'REE_CONFIRMADO_BAD2', 'REE_DESPUBLICADO_BAD', 'REE_CONFIRMADO_TIMEOUT_BAD', 'REE_CONFIRMADO_TIMEOUT_BAD2'],
+      pending: ['REE_PUBLICADO', 'REE_RECOGIDO_PDTE_CONFIRM'],
       ok : ['REE_CONFIRMADO_OK', 'REE_RECOGIDO', 'REE_DESPUBLICADO', 'REE_NO_PUBLICADO', 'REE_NO_PUBLICADO_NOTIFICABLE']
     }
 
-    // Can omit Types
+    // Can omit FileTypes
     $scope.omitTypes = {
       OK: true,
       BAD2: true,
@@ -42,11 +41,21 @@ angular.module('meanApp')
       ACUMAGREREOS2: true
     };
 
-    // Can omit Types
+    // Can omit InputStateTypes
     $scope.omitInputStates = {
       PROCESADO_COMPLETADO: false,
-      DUPLICADO: false,
-      REVISADO: false
+      DUPLICADO: true
+    };
+
+    // Can omit OutputStateTypes
+    $scope.omitOutputStates = {
+      REE_DESPUBLICADO: true
+    };
+
+    // Can omit Input/Output Files
+    $scope.omitIO = {
+      ENTRADA: false,
+      SALIDA: false
     };
 
     $scope.idSelectedFile = null;
@@ -92,10 +101,25 @@ angular.module('meanApp')
         function(response){
           var ficheros = response.data;
           ficheros = ficheros.filter(function(file){
+
+            file.entrada = (file.hasOwnProperty('inputState')) ? true : false;
+            file.salida = (file.hasOwnProperty('outputState')) ? true : false;
+            file.revisado = (file.hasOwnProperty('stateForcedBy')) ? true : false;
+            file.outputBad = isOutputBad(file);
+            file.outputError = isOutputError(file);
+
             var filterRevisado = true;
             if($scope.omitInputStates['REVISADO'])
-              filterRevisado = (file.stateForcedBy !== undefined) ? false : true;
-            return !$scope.omitTypes[file.fileType] && !$scope.omitInputStates[file.inputState] && filterRevisado;
+              filterRevisado = file.revisado;
+            var filterEntrada = true;
+            if($scope.omitIO['ENTRADA'])
+              filterEntrada = !file.entrada;
+            var filterSalida = true;
+            if($scope.omitIO['SALIDA'])
+              filterSalida = !file.salida;
+
+            return !$scope.omitTypes[file.fileType] && !$scope.omitInputStates[file.inputState] && !$scope.omitOutputStates[file.outputState]
+                      && filterRevisado && filterEntrada && filterSalida;
           });
           var filters = {
             filename: document.querySelector('input[name="filename"]').value,
@@ -103,7 +127,7 @@ angular.module('meanApp')
           };
           $scope.tableParams = new NgTableParams({
             page: 1,
-            count: 25,
+            count: 50,
             filter: filters
           }, {data: ficheros});
         }, function(error){
@@ -114,11 +138,6 @@ angular.module('meanApp')
 
     // Init
     $scope.refreshTable();
-    /*
-    setInterval(function(){
-      $scope.refreshTable();
-    }, $rootScope.pollInterval);
-    */
 
 
     /* ------- AUX Functions ---------*/
@@ -141,19 +160,55 @@ angular.module('meanApp')
         }, 1);
       }
     }
+
+    /**
+     * Especifica si el fichero de salida está en un estado de auditoria bad
+     * @param file
+     */
+    function isOutputBad(file){
+      if (file.hasOwnProperty('outputState')){ //fichero de salida
+
+        if ( $scope.outputStates.bad.indexOf(file.outputState) >= 0 ) //is a bad state
+          return true;
+
+      }
+      return false;
+    }
+
+    /**
+     * Especifica si el fichero de salida está en un estado de auditoria error
+     * @param file
+     */
+    function isOutputError(file){
+      if (file.hasOwnProperty('outputState')){ //fichero de salida
+
+        if ( $scope.outputStates.error.indexOf(file.outputState) >= 0 ) //is a error state
+          return true;
+
+      }
+      return false;
+    }
+
     /* ------- END AUX Functions ---------*/
 
     /* ------- MODAL --------- */
 
     $scope.setReviewed = function(){
-      var inputFile = $scope.selectedFile;
-      delete inputFile.errorMsg;
-      inputFile.inputState = 'PROCESADO_COMPLETADO';
-      inputFile.stateForcedBy = $cookies.getObject('currentUser').username;
-      inputFile.comment = $scope.comment;
+      var file = $scope.selectedFile;
+      delete file.errorMsg;
+
+      if(file.hasOwnProperty('inputState')) //fichero de entrada
+        file.inputState = 'PROCESADO_COMPLETADO';
+
+      else if(file.hasOwnProperty('outputState')) //fichero de salida
+        file.outputState = 'REE_DESPUBLICADO';
+
+      file.stateForcedBy = $cookies.getObject('currentUser').username;
+      file.comment = $scope.comment;
+
       $http.post(
         'http://'+$rootScope.serverConfig.host+':'+$rootScope.serverConfig.port+'/api/audit/'+$rootScope.distrib.alias,
-        inputFile
+        file
       ).then(
         function(response){
           //nothing to do

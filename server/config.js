@@ -2,8 +2,8 @@ module.exports = {
   /* Servers */
   dbUser: 'csadmin',
   dbPass: 'csp455',
-  //dbIp: '192.168.246.151',
-  dbIp: '192.168.0.150',
+  dbIp: '192.168.246.151',
+  //dbIp: '192.168.0.150',
   dbPort: '27017',
 
   auditCollectionName: 'entradaAuditoria',
@@ -35,7 +35,7 @@ module.exports = {
   */
   /* Compression Files */
   filesWithoutCompression: [
-    'interobjedistrib',
+//    'interobjedistrib',
     'reinterobjedistrib',
     'bad2',
     'curvas-telemedida',

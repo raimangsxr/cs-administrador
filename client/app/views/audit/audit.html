@@ -7,18 +7,39 @@
       <button class="btn btn-default" ng-class="{'btn-primary': d === distrib}" ng-repeat="d in distribuidoras" ng-click="changeDistrib($index)">{{d.alias|uppercase}}</button>
     </div>
   </div>
-  <div class="col-md-12 text-center">
-    <div class="btn-group">
-      <label class="btn btn-default disabled">Omitir los siguientes tipos</label>
+  <div class="col-md-12 filter_row">
+    <div class="col-md-4 text-right">
+      <label class="btn btn-default disabled">Omitir por tipo de fichero</label>
+    </div>
+    <div class="btn-group col-md-8">
       <label class="btn btn-default" ng-repeat="(type,value) in omitTypes" ng-change="refreshTable()" ng-model="omitTypes[type]" uib-btn-checkbox>{{type}}</label>
     </div>
   </div>
-  <div class="col-md-12 text-center">
-    <div class="btn-group">
-      <label class="btn btn-default disabled">Omitir los siguientes estados</label>
+  <div class="col-md-12 filter_row">
+    <div class="col-md-4 text-right">
+      <label class="btn btn-default disabled">Omitir por estado final (Entrada)</label>
+    </div>
+    <div class="btn-group col-md-8">
       <label class="btn btn-default" ng-repeat="(state,value) in omitInputStates" ng-change="refreshTable()" ng-model="omitInputStates[state]" uib-btn-checkbox>{{state}}</label>
     </div>
   </div>
+  <div class="col-md-12 filter_row">
+    <div class="col-md-4 text-right">
+      <label class="btn btn-default disabled">Omitir por estado final (Salida)</label>
+    </div>
+    <div class="btn-group col-md-8">
+      <label class="btn btn-default" ng-repeat="(state,value) in omitOutputStates" ng-change="refreshTable()" ng-model="omitOutputStates[state]" uib-btn-checkbox>{{state}}</label>
+    </div>
+  </div>
+  <div class="col-md-12 filter_row">
+    <div class="col-md-4 text-right">
+      <label class="btn btn-default disabled">Omitir por ficheros entrada/salida</label>
+    </div>
+    <div class="btn-group col-md-8">
+      <label class="btn btn-default" ng-repeat="(state,value) in omitIO" ng-change="refreshTable()" ng-model="omitIO[state]" uib-btn-checkbox>{{state}}</label>
+    </div>
+  </div>
+
   <div class="col-md-12 vert-offset-top-2 vert-offset-bottom-6">
     <div id="list" class="col-md-12 animate">
       <div class="panel panel-primary">
@@ -26,8 +47,10 @@
         <div class="panel-body">
           <table ng-table="tableParams" class="table" show-filter="true">
             <tr ng-click="selectFile(file, $index)" ng-class="{selected: $index === idSelectedFile,
-                      'green': inputStateColors['green'].indexOf(file.inputState) >= 0
-                              || outputStates['ok'].indexOf(file.outputState) >= 0,
+                      'green': (inputStateColors['green'].indexOf(file.inputState) >= 0
+                              || outputStates['ok'].indexOf(file.outputState) >= 0)
+                              && file.revisado === false,
+                      'darkgreen': file.revisado,
                       'yellow': inputStateColors['yellow'].indexOf(file.inputState) >= 0
                               || outputStates['pending'].indexOf(file.outputState) >= 0,
                       'red': inputStateColors['red'].indexOf(file.inputState) >= 0
@@ -37,16 +60,15 @@
               <td title="'Nombre'" filter="{'filename': 'text'}" sortable="'filename'">
                 <a title="{{file.filename}}" ng-href="http://{{serverConfig.host}}:{{serverConfig.port}}/api/file/{{distrib.alias}}/{{distrib.code}}/{{file.filename}}">{{file.filename}}</a>
               </td>
-              <!--
-              <td title="'Tipo'" filter="{'fileType': 'text'}" sortable="'fileType'">
-                {{file.fileType}}
-              </td>
-              -->
               <td title="'Refresco'" filter="{ creationDate: 'text'}" sortable="'creationDate'">
                 {{file.creationDate | date:"dd/MM/yyyy 'a las' HH:mm"}}
               </td>
               <td title="'Ops'">
-                <button ng-if="file.inputState" title="Ver estados de ficheros generados por este fichero" class="btn btn-default" ng-click="showDetail(file, $index); $event.stopPropagation();">Detalle</button>
+                <div class="btn-group-vertical btn-block">
+                  <button ng-if="file.entrada" title="Ver estados de ficheros generados por este fichero" class="btn btn-default" ng-click="showDetail(file, $index); $event.stopPropagation();">Detalle</button>
+                  <a ng-if="file.outputBad" title="Descargar y ver fichero BAD asociado" class="btn btn-default" ng-href="http://{{serverConfig.host}}:{{serverConfig.port}}/api/file/{{distrib.alias}}/{{distrib.code}}/{{file.filename}}.bad2">Ver BAD</a>
+                  <button ng-if="file.outputBad || file.outputError" title="Establecer estado de revisado manualmente" class="btn btn-default" ng-click="confirmReview()">Revisar</button>
+                </div>
               </td>
             </tr>
           </table>
@@ -55,7 +77,7 @@
     </div>
 
     <!-- Timeline -->
-    <custom-timeline id="timeline" filename="selectedFile.filename" data="auditData" ng-show="auditData" class="col-md-5">
+    <custom-timeline id="timeline" filename="selectedFile.filename" data="auditData" ng-show="auditData" class="col-md-5" set-class-when-at-top="fix-to-top">
     </custom-timeline>
     <!-- END Timeline -->
 
