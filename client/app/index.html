@@ -9,9 +9,9 @@
     <link rel="icon" type="image/ico" href="favicon.ico">
     <!-- build:css(.) styles/vendor.css -->
     <!-- bower:css -->
-    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
     <link rel="stylesheet" href="bower_components/ng-table/dist/ng-table.min.css" />
     <link rel="stylesheet" href="bower_components/bootstrap-daterangepicker/daterangepicker-bs3.css" />
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
     <link rel="stylesheet" href="bower_components/angular-chart.js/dist/angular-chart.css" />
     <link rel="stylesheet" href="bower_components/Bootflat/bootflat/css/bootflat.css" />
     <link rel="stylesheet" href="bower_components/Bootflat/bootflat/css/bootflat.min.css" />
@@ -24,7 +24,7 @@
     <link rel="stylesheet" href="styles/animate_daneden.css">
     <!-- endbuild -->
   </head>
-  <body ng-app="meanApp">
+  <body ng-app="csAdministratorApp">
     <!--[if lte IE 8]>
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
@@ -42,16 +42,16 @@
               <span class="icon-bar"></span>
             </button>
 
-            <a class="navbar-brand" href="#/">Administración CS</a>
+            <a class="navbar-brand" href="#!/">Administración CS</a>
           </div>
 
           <div class="collapse navbar-collapse" id="js-navbar-collapse">
 
             <ul class="nav navbar-nav">
-              <li id="dashboard" class="active" ng-click="setActive('dashboard')"><a href="#/"><i class="glyphicon glyphicon-dashboard"></i> Dashboard</a></li>
-              <li id="entrada" ng-click="setActive('entrada')"><a ng-href="#/entrada"><i class="glyphicon glyphicon-circle-arrow-right"></i> Ficheros de entrada</a></li>
-              <li id="salida" ng-click="setActive('salida')"><a ng-href="#/salida"><i class="glyphicon glyphicon-circle-arrow-left"></i> Ficheros de salida</a></li>
-              <li id="audit" ng-click="setActive('audit')"><a ng-href="#/audit"><i class="glyphicon glyphicon-eye-open"></i> Auditoría</a></li>
+              <li id="dashboard" class="active" ng-click="setActive('dashboard')"><a href="#!/"><i class="glyphicon glyphicon-dashboard"></i> Dashboard</a></li>
+              <li id="entrada" ng-click="setActive('entrada')"><a ng-href="#!/entrada"><i class="glyphicon glyphicon-circle-arrow-right"></i> Ficheros de entrada</a></li>
+              <li id="salida" ng-click="setActive('salida')"><a ng-href="#!/salida"><i class="glyphicon glyphicon-circle-arrow-left"></i> Ficheros de salida</a></li>
+              <li id="audit" ng-click="setActive('audit')"><a ng-href="#!/audit"><i class="glyphicon glyphicon-eye-open"></i> Auditoría</a></li>
               <!--<li><a ng-href="#/atencion"><i class="glyphicon glyphicon-exclamation-sign"></i> Requieren atención</a></li>
               <li><a ng-href="#/revision"><i class="glyphicon glyphicon-list-alt"></i> Revisión ficheros</a></li>
               -->
@@ -91,18 +91,14 @@
     <!-- bower:js -->
     <script src="bower_components/jquery/dist/jquery.js"></script>
     <script src="bower_components/angular/angular.js"></script>
-    <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
     <script src="bower_components/angular-animate/angular-animate.js"></script>
     <script src="bower_components/angular-cookies/angular-cookies.js"></script>
-    <script src="bower_components/angular-messages/angular-messages.js"></script>
-    <script src="bower_components/angular-resource/angular-resource.js"></script>
     <script src="bower_components/angular-route/angular-route.js"></script>
-    <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
-    <script src="bower_components/angular-touch/angular-touch.js"></script>
     <script src="bower_components/ng-table/dist/ng-table.min.js"></script>
     <script src="bower_components/moment/moment.js"></script>
     <script src="bower_components/momentjs/moment.js"></script>
     <script src="bower_components/bootstrap-daterangepicker/daterangepicker.js"></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
     <script src="bower_components/ng-bs-daterangepicker/src/ng-bs-daterangepicker.js"></script>
     <script src="bower_components/angular-locale_es-es/angular-locale_es-es.js"></script>
     <script src="bower_components/Chart.js/Chart.js"></script>
@@ -116,22 +112,29 @@
     <!-- endbower -->
     <!-- endbuild -->
 
-        <!-- build:js({.tmp,app}) scripts/scripts.js -->
-        <script src="scripts/app.js"></script>
-        <script src="scripts/controllers/login.js"></script>
-        <script src="scripts/controllers/root.js"></script>
-        <script src="scripts/controllers/dashboard.js"></script>
-        <script src="scripts/controllers/about.js"></script>
-        <script src="scripts/controllers/revficheros.js"></script>
-        <script src="scripts/controllers/atencion.js"></script>
-        <script src="scripts/controllers/entrada/entrada.js"></script>
-        <script src="scripts/controllers/entrada/entrada_detalle.js"></script>
-        <script src="scripts/controllers/salida/salida.js"></script>
-        <script src="scripts/controllers/salida/salida_detalle.js"></script>
-        <script src="scripts/controllers/audit/audit.js"></script>
-        <script src="scripts/directives/custom-timeline.js"></script>
-        <script src="scripts/directives/custom-timeline-entry.js"></script>
-        <script src="scripts/directives/set-class-when-at-top.js"></script>
-        <!-- endbuild -->
+    <!-- build:js({.tmp,app}) scripts/scripts.js -->
+    <script src="scripts/app.js"></script>
+    <script src="scripts/controllers/login.js"></script>
+    <script src="scripts/controllers/root.js"></script>
+    <script src="scripts/controllers/dashboard.js"></script>
+    <script src="scripts/controllers/about.js"></script>
+    <script src="scripts/controllers/revficheros.js"></script>
+    <script src="scripts/controllers/atencion.js"></script>
+    <script src="scripts/controllers/entrada/entrada.js"></script>
+    <script src="scripts/controllers/entrada/entrada_detalle.js"></script>
+    <script src="scripts/controllers/salida/salida.js"></script>
+    <script src="scripts/controllers/salida/salida_detalle.js"></script>
+    <script src="scripts/controllers/audit/audit.js"></script>
+    <script src="scripts/directives/custom-timeline.js"></script>
+    <script src="scripts/directives/custom-timeline-entry.js"></script>
+    <script src="scripts/directives/set-class-when-at-top.js"></script>
+    <script src="components/inputDetailAudit/controller.js"></script>
+    <script src="components/outputDetailAudit/controller.js"></script>
+    <script src="components/outputDetailAudit/controller_review.js"></script>
+    <script src="components/listDetailAudit/controller.js"></script>
+    <script src="components/listDetailAudit/controller_review.js"></script>
+    <script src="components/baldDetailAudit/controller.js"></script>
+    <script src="components/baldDetailAudit/controller_review.js"></script>
+    <!-- endbuild -->
 </body>
 </html>

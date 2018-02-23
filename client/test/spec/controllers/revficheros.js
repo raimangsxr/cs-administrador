@@ -3,7 +3,7 @@
 describe('Controller: RevficherosCtrl', function () {
 
   // load the controller's module
-  beforeEach(module('meanApp'));
+  beforeEach(module('csAdministratorApp'));
 
   var RevficherosCtrl,
     scope;

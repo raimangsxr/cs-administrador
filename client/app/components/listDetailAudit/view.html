@@ -1,0 +1,35 @@
+<div class="modal-content">
+  <div class="modal-header green">
+    <h5 class="modal-title">Mostrando {{$ctrl.fileCounter}} ficheros de salida generados por {{$ctrl.file.filename}}</h5>
+  </div>
+  <div class="modal-body">
+    <table ng-table="$ctrl.detailTableParams" class="table" show-filter="true">
+      <tr ng-class="{
+              'green': $ctrl.outputStates.ok.indexOf(file.outputState) >= 0,
+              'yellow': $ctrl.outputStates.pending.indexOf(file.outputState) >= 0,
+              'brown': $ctrl.outputStates.bad.indexOf(file.outputState) >= 0,
+              'red': $ctrl.outputStates.error.indexOf(file.outputState) >= 0
+            }" class="animate" ng-repeat="file in $data">
+        <td title="'Nombre'" filter="{'filename': 'text'}" sortable="'filename'">
+          <a ng-href="{{file.link}}">
+            {{file.filename}}
+          </a>
+        </td>
+        <td title="'Estado'" filter="{'outputState': 'text'}" sortable="'outputState'">
+          <span ng-if="$ctrl.outputStates.bad.indexOf(file.outputState) < 0">{{file.outputState}}</span>
+          <a class="" ng-if="$ctrl.outputStates.bad.indexOf(file.outputState) >= 0"
+             ng-href="{{file.link}}.bad2">
+            {{file.outputState}}
+          </a>
+        </td>
+        <td title="'Últ. Actualización'" filter="{ creationDate: 'text'}" sortable="'creationDate'">
+          {{file.creationDate | date:"dd/MM/yyyy 'a las' HH:mm"}}
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default" ng-if="$ctrl.canSetReviewedFile" ng-click="$ctrl.confirmReview()">Revisar</button>
+    <button type="button" class="btn btn-primary" ng-click="$ctrl.close()">Cerrar</button>
+  </div>
+</div>

@@ -3,7 +3,7 @@
 describe('Controller: DetalleCtrl', function () {
 
   // load the controller's module
-  beforeEach(module('meanApp'));
+  beforeEach(module('csAdministratorApp'));
 
   var DetalleCtrl,
     scope;

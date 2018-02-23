@@ -2,12 +2,12 @@
 
 /**
  * @ngdoc function
- * @name meanApp.controller:MainCtrl
+ * @name csAdministratorApp.controller:MainCtrl
  * @description
  * # MainCtrl
- * Controller of the meanApp
+ * Controller of the csAdministratorApp
  */
-angular.module('meanApp')
+angular.module('csAdministratorApp')
   .controller('RevficherosCtrl', function ($scope, $animate, NgTableParams) {
     var ficheros = [
       {
@@ -109,6 +109,6 @@ angular.module('meanApp')
       })
       $scope.tableParams = new NgTableParams({page: 1, count: 10}, { data: result});
     }
-    
-    
+
+
   });

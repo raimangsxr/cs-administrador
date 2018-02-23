@@ -1,0 +1,16 @@
+<div class="btn-group-vertical btn-block">
+  <a
+    ng-if="$ctrl.file.outputBad"
+    title="Descargar y ver fichero BAD asociado"
+    class="btn btn-default"
+    ng-href="{{$ctrl.file.link}}.bad2">
+      Ver BAD
+  </a>
+  <button
+    ng-if="$ctrl.file.outputBad || $ctrl.file.outputError"
+    title="Establecer estado de revisado manualmente"
+    class="btn btn-default"
+    ng-click="$ctrl.confirmReview($ctrl.file); $event.stopPropagation();">
+      Revisar
+  </button>
+</div>

@@ -2,11 +2,11 @@
 
 /**
  * @ngdoc function
- * @name meanApp.controller:AtencionCtrl
+ * @name csAdministratorApp.controller:AtencionCtrl
  * @description
  * # AtencionCtrl
- * Controller of the meanApp
+ * Controller of the csAdministratorApp
  */
-angular.module('meanApp')
+angular.module('csAdministratorApp')
   .controller('AtencionCtrl', function ($scope, $http) {
 });

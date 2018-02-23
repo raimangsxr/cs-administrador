@@ -3,7 +3,7 @@
 describe('Controller: AtencionCtrl', function () {
 
   // load the controller's module
-  beforeEach(module('meanApp'));
+  beforeEach(module('csAdministratorApp'));
 
   var AtencionCtrl,
     scope;

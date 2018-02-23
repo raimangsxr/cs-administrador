@@ -2,15 +2,18 @@
 
 /**
  * @ngdoc function
- * @name meanApp.controller:AuditCtrl
+ * @name csAdministratorApp.controller:AuditCtrl
  * @description
  * # AuditCtrl
- * Controller of the meanApp
+ * Controller of the csAdministratorApp
  */
-angular.module('meanApp')
-  .controller('AuditCtrl', function ($scope, $rootScope, $http, $cookies, _, NgTableParams) {
+angular.module('csAdministratorApp')
+  .controller('AuditCtrl', function ($scope, $rootScope, $http, $log, $q, $cookies, $uibModal, _, NgTableParams) {
     $scope.auditOutputData = [];
-    $scope.selectedFile = {}
+    $scope.selectedFile = {};
+
+    // BALD lost tolerance in percent
+    $scope.BALD_tolerance = 15;
 
     // Audit INPUT States
     $scope.inputStateColors = {
@@ -30,12 +33,17 @@ angular.module('meanApp')
       ok : ['REE_CONFIRMADO_OK', 'REE_RECOGIDO', 'REE_DESPUBLICADO', 'REE_NO_PUBLICADO', 'REE_NO_PUBLICADO_NOTIFICABLE']
     }
 
+    // Can review files
+    $scope.canReviewFilesByInputState = ['PROCESADO_ERROR', 'PROCESADO_INCORRECTO_PDTE_INFORME'];
+    $scope.canReviewFilesByOutputState = ['REE_CONFIRMADO_BAD', 'REE_CONFIRMADO_BAD2', 'REE_DESPUBLICADO_BAD', 'REE_CONFIRMADO_TIMEOUT_BAD', 'REE_CONFIRMADO_TIMEOUT_BAD2'];
+    $scope.canReviewFilesByType = ['BALD','CUPS34','CUPS5'];
+
     // Can omit FileTypes
     $scope.omitTypes = {
       OK: true,
       BAD2: true,
       PERFF: true,
-      BALD: true,
+      BALD: false,
       ACUM: true,
       AGCLACUM: true,
       ACUMAGREREOS2: true
@@ -77,64 +85,69 @@ angular.module('meanApp')
       });
     };
 
-    $scope.showDetail = function(file, index){
-      $scope.selectFile(file, index);
-      $scope.canSetReviewedFile = (file.inputState === 'PROCESADO_INCORRECTO_PDTE_INFORME' || file.inputState === 'PROCESADO_ERROR') ? true : false;
-      $http.get('http://'+$rootScope.serverConfig.host+':'+$rootScope.serverConfig.port+'/api/audit/generatedby/'+$rootScope.distrib.alias+'/'+file.filename).then(
-        function(response){
-          var auditOutputData = response.data;
-          $scope.detailTableParams = new NgTableParams({
-            page: 1,
-            count: 10
-          }, {data: auditOutputData});
-          var fileDetailModal = angular.element(document.querySelector('#fileDetailModal'));
-          fileDetailModal.modal();
-        }, function(error){
-          console.log(error);
-      });
-    }
-
     $scope.refreshTable = function(){
       if(!$rootScope.distrib.alias)
         return;
+      $scope.loading = true;
       $http.get('http://'+$rootScope.serverConfig.host+':'+$rootScope.serverConfig.port+'/api/audit/'.concat($rootScope.distrib.alias)).then(
         function(response){
-          var ficheros = response.data;
-          ficheros = ficheros.filter(function(file){
+          var files = response.data;
+          files = files.map(function(file){
 
             file.entrada = (file.hasOwnProperty('inputState')) ? true : false;
             file.salida = (file.hasOwnProperty('outputState')) ? true : false;
             file.revisado = (file.hasOwnProperty('stateForcedBy')) ? true : false;
             file.outputBad = isOutputBad(file);
             file.outputError = isOutputError(file);
+            file.link = 'http://'+$rootScope.serverConfig.host+':'+$rootScope.serverConfig.port+'/api/file/'+$rootScope.distrib.alias+'/'+$rootScope.distrib.code+'/'+file.filename;
 
-            var filterRevisado = true;
-            if($scope.omitInputStates['REVISADO'])
-              filterRevisado = file.revisado;
-            var filterEntrada = true;
-            if($scope.omitIO['ENTRADA'])
-              filterEntrada = !file.entrada;
-            var filterSalida = true;
-            if($scope.omitIO['SALIDA'])
-              filterSalida = !file.salida;
-
-            return !$scope.omitTypes[file.fileType] && !$scope.omitInputStates[file.inputState] && !$scope.omitOutputStates[file.outputState]
-                      && filterRevisado && filterEntrada && filterSalida;
+            return file;
           });
-          var filters = {
-            filename: document.querySelector('input[name="filename"]').value,
-            creationDate: document.querySelector('input[name="creationDate"]').value
-          };
-          $scope.tableParams = new NgTableParams({
-            page: 1,
-            count: 50,
-            filter: filters
-          }, {data: ficheros});
-        }, function(error){
-          console.log(error);
+          processFileDetails(files).then(
+            function(results){
+              var filtered_results = results.filter(function(file){
+                var filterRevisado = true;
+                if($scope.omitInputStates['REVISADO'])
+                  filterRevisado = file.revisado;
+                var filterEntrada = true;
+                if($scope.omitIO['ENTRADA'])
+                  filterEntrada = !file.entrada;
+                var filterSalida = true;
+                if($scope.omitIO['SALIDA'])
+                  filterSalida = !file.salida;
+
+                return !$scope.omitTypes[file.fileType] && !$scope.omitInputStates[file.inputState] && !$scope.omitOutputStates[file.outputState]
+                  && filterRevisado && filterEntrada && filterSalida;
+              });
+              $scope.loading = false;
+              var filters = {
+                filename: document.querySelector('input[name="filename"]').value,
+                creationDate: document.querySelector('input[name="creationDate"]').value
+              };
+              $scope.tableParams = new NgTableParams({
+                page: 1,
+                count: 50,
+                sorting: { creationDate: "desc" },
+                filter: filters
+              }, {data: filtered_results});
+            },
+            function(err){
+              $scope.loading = false;
+              $log.error(JSON.stringify(err));
+            }
+          );
+        }, function(err){
+          $log.error(JSON.stringify(err));
       });
     };
 
+
+    $scope.isInput = function(file){
+      return file.entrada;
+    };
+    $scope.isOutput = function(file){
+      return file.salida;
+    };
 
     // Init
     $scope.refreshTable();
@@ -189,55 +202,54 @@ angular.module('meanApp')
       return false;
     }
 
-    /* ------- END AUX Functions ---------*/
-
-    /* ------- MODAL --------- */
-
-    $scope.setReviewed = function(){
-      var file = $scope.selectedFile;
-      delete file.errorMsg;
-
-      if(file.hasOwnProperty('inputState')) //fichero de entrada
-        file.inputState = 'PROCESADO_COMPLETADO';
-
-      else if(file.hasOwnProperty('outputState')) //fichero de salida
-        file.outputState = 'REE_DESPUBLICADO';
-
-      file.stateForcedBy = $cookies.getObject('currentUser').username;
-      file.comment = $scope.comment;
-
-      $http.post(
-        'http://'+$rootScope.serverConfig.host+':'+$rootScope.serverConfig.port+'/api/audit/'+$rootScope.distrib.alias,
-        file
-      ).then(
-        function(response){
-          //nothing to do
+    function processFileDetails(files){
+      var deferred = $q.defer();
+      var promises = [];
+      var notProcessed = [];
+      files.forEach(function(file){
+        if (file.fileType.toUpperCase() === 'BALD') {
+          promises.push(_getAndParseBald(file));
+          return
+        }
+        /*
+        if (file.fileType.toUpperCase() === 'CIERRES') {
+          promises.push(_getAndParseBald(file));
+          return
+        }
+        */
+        notProcessed.push(file);
+      });
+      $q.all(promises).then(
+        function(results){
+          var total_files = notProcessed.concat(results);
+          deferred.resolve(total_files);
         },
-        function (error){
-          console.error(error);
+        function(err){
+          $log.error(JSON.stringify(err));
+          deferred.reject('Error getting files!');
         }
       );
-    };
-
-    $scope.confirmReview = function() {
-      var confirmReviewModal = angular.element(document.querySelector('#confirmReviewModal'));
-      confirmReviewModal.modal();
+      return deferred.promise;
     }
 
-    /* AUX Functions */
-    function canSetReviewed(outputFiles){
-      var bads = 0;
-      var oks = 0;
-      outputFiles.forEach(function (file){
-        if($scope.outputStates.bad.indexOf(file.outputState) >= 0) //is a bad state
-          bads++;
-        else if ($scope.outputStates.ok.indexOf(file.outputState) >= 0 )
-          oks++;
-      });
-      return ((bads > 0) &&
-        (outputFiles.length === (oks + bads)) &&
-        ($scope.selectedFile.inputState === 'PROCESADO_INCORRECTO_PDTE_INFORME')) ? true : false;
+    function _getAndParseBald(file){
+      var deferred = $q.defer();
+      $http.get(file.link).then(
+        function (response) {
+          var fields = response.data.trim().split(';');
+          file.demand = fields[15];
+          file.adquisition = fields[16];
+          file.lost = fields[17];
+          file.lost_percent = fields[18];
+          if((file.lost_percent < 0 || file.lost_percent > $scope.BALD_tolerance) && !file.revisado)
+            file.inputState = 'PROCESADO_INCORRECTO_PDTE_INFORME';
+          deferred.resolve(file);
+        }, function (err) {
+          $log.error(JSON.stringify(err));
+        });
+      return deferred.promise;
     }
 
-    /* ------ END MODAL --------- */
+    /* ------- END AUX Functions ---------*/
+
   });

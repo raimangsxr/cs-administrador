@@ -2,12 +2,12 @@
 
 /**
  * @ngdoc function
- * @name meanApp.controller:AboutCtrl
+ * @name csAdministratorApp.controller:AboutCtrl
  * @description
  * # AboutCtrl
- * Controller of the meanApp
+ * Controller of the csAdministratorApp
  */
-angular.module('meanApp')
+angular.module('csAdministratorApp')
   .controller('AboutCtrl', function () {
     this.awesomeThings = [
       'HTML5 Boilerplate',

@@ -2,9 +2,9 @@
 
 /**
  * @ngdoc overview
- * @name meanApp
+ * @name csAdministratorApp
  * @description
- * # meanApp
+ * # csAdministratorApp
  *
  * Main module of the application.
  */
@@ -14,14 +14,10 @@ underscore.factory('_', ['$window', function($window) {
 }]);
 
 angular
-  .module('meanApp', [
+  .module('csAdministratorApp', [
     'ngAnimate',
     'ngCookies',
-    'ngMessages',
-    'ngResource',
     'ngRoute',
-    'ngSanitize',
-    'ngTouch',
     'ngTable',
     'ngBootstrap',
     'chart.js',

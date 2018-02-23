@@ -2,12 +2,12 @@
 
 /**
  * @ngdoc function
- * @name meanApp.controller:SalidaCtrl
+ * @name csAdministratorApp.controller:SalidaCtrl
  * @description
  * # SalidaCtrl
- * Controller of the meanApp
+ * Controller of the csAdministratorApp
  */
-angular.module('meanApp')
+angular.module('csAdministratorApp')
   .controller('SalidaCtrl', function ($scope, $rootScope, $http, NgTableParams) {
 
     $scope.periodos = [

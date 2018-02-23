@@ -1,0 +1,16 @@
+<div class="modal-content">
+  <form name="review" novalidate>
+    <div class="modal-header">
+      <button type="button" class="close" ng-click="close()">&times;</button>
+      <h4 class="modal-title">Añadir un comentario para forzar esta transición.</h4>
+    </div>
+    <div class="modal-body">
+      <textarea placeholder="Comentario..." name="comment" ng-model="comment" style="min-width: 100%" required></textarea>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-primary" ng-click="close()">Cerrar</button>
+      <button type="button" class="btn btn-default" ng-show="review.comment.$invalid" disabled>Confirmar</button>
+      <button type="button" class="btn btn-default" ng-click="setReviewed()" ng-show="review.comment.$valid">Confirmar</button>
+    </div>
+  </form>
+</div>

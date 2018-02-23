@@ -1,0 +1,37 @@
+<div class="modal-content">
+  <div class="modal-header green">
+    <h5 class="modal-title" id="modal-title">Mostrando detalle del fichero {{$ctrl.file.filename}}</h5>
+  </div>
+  <div class="modal-body">
+    <div class="row vert-offset-top-3">
+      <div class="col-md-4 text-right"><strong>Adquisición</strong></div>
+      <div class="col-md-8 text-left">{{$ctrl.file.adquisition | number}} kWh</div>
+    </div>
+    <div class="row">
+      <div class="col-md-4 text-right "><strong>Demanda</strong></div>
+      <div class="col-md-8 text-left">{{$ctrl.file.demand | number}} kWh</div>
+    </div>
+    <div class="row">
+      <div class="col-md-offset-2 col-md-4"><hr></div>
+    </div>
+    <div class="row">
+      <div class="col-md-4 text-right"><strong>Pérdidas</strong></div>
+      <div class="col-md-8 text-left">{{$ctrl.file.lost | number}} kWh</div>
+    </div>
+    <div class="row">
+      <div class="col-md-4 text-right"><strong>Pérdidas (%)</strong></div>
+      <div class="col-md-8 text-left">{{$ctrl.file.lost_percent | number : 2}} %</div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button
+      title="Establecer estado de revisado manualmente"
+      class="btn btn-default"
+      ng-if="$ctrl.canReviewFilesByInputState.indexOf($ctrl.file.inputState) >= 0
+            || ($ctrl.canReviewFilesByType.indexOf($ctrl.file.fileType) >= 0 && $ctrl.file.inputState != 'PROCESADO_COMPLETADO')"
+      ng-click="$ctrl.confirmReview(); $event.stopPropagation();">
+      Revisar
+    </button>
+    <button type="button" class="btn btn-primary" ng-click="$ctrl.close()">Cerrar</button>
+  </div>
+</div>

@@ -2,12 +2,12 @@
 
 /**
  * @ngdoc function
- * @name meanApp.controller:EntradaCtrl
+ * @name csAdministratorApp.controller:EntradaCtrl
  * @description
  * # EntradaCtrl
- * Controller of the meanApp
+ * Controller of the csAdministratorApp
  */
-angular.module('meanApp')
+angular.module('csAdministratorApp')
   .controller('EntradaCtrl', function ($scope, $rootScope, $http, NgTableParams) {
 
     $scope.periodos = [

@@ -40,7 +40,9 @@
     </div>
   </div>
 
-  <div class="col-md-12 vert-offset-top-2 vert-offset-bottom-6">
+
+
+  <div ng-show="!loading" class="col-md-12 vert-offset-top-2 vert-offset-bottom-6">
     <div id="list" class="col-md-12 animate">
       <div class="panel panel-primary">
         <div class="panel-heading"><h3 class="panel-title">Registro de entrada</h3></div>
@@ -57,18 +59,21 @@
                               || outputStates['error'].indexOf(file.outputState) >= 0
                               || outputStates['bad'].indexOf(file.outputState) >= 0
                     }" class="animate" ng-repeat="file in $data">
-              <td title="'Nombre'" filter="{'filename': 'text'}" sortable="'filename'">
+              <td style="vertical-align: middle;" title="'Nombre'" filter="{'filename': 'text'}" sortable="'filename'">
                 <a title="{{file.filename}}" ng-href="http://{{serverConfig.host}}:{{serverConfig.port}}/api/file/{{distrib.alias}}/{{distrib.code}}/{{file.filename}}">{{file.filename}}</a>
               </td>
-              <td title="'Refresco'" filter="{ creationDate: 'text'}" sortable="'creationDate'">
+              <td style="vertical-align: middle;" title="'Refresco'" filter="{ creationDate: 'text'}" sortable="'creationDate'">
                 {{file.creationDate | date:"dd/MM/yyyy 'a las' HH:mm"}}
               </td>
-              <td title="'Ops'">
-                <div class="btn-group-vertical btn-block">
-                  <button ng-if="file.entrada" title="Ver estados de ficheros generados por este fichero" class="btn btn-default" ng-click="showDetail(file, $index); $event.stopPropagation();">Detalle</button>
-                  <a ng-if="file.outputBad" title="Descargar y ver fichero BAD asociado" class="btn btn-default" ng-href="http://{{serverConfig.host}}:{{serverConfig.port}}/api/file/{{distrib.alias}}/{{distrib.code}}/{{file.filename}}.bad2">Ver BAD</a>
-                  <button ng-if="file.outputBad || file.outputError" title="Establecer estado de revisado manualmente" class="btn btn-default" ng-click="confirmReview()">Revisar</button>
-                </div>
+              <td style="vertical-align: middle;" title="'Ops'">
+                <input-detail-audit
+                  ng-if="isInput(file)"
+                  file="file"
+                  output-states="outputStates"
+                  can-review-files-by-input-state="canReviewFilesByInputState"
+                  can-review-files-by-type="canReviewFilesByType">
+                </input-detail-audit>
+                <output-detail-audit ng-if="isOutput(file)" file="file" output-states="outputStates"></output-detail-audit>
               </td>
             </tr>
           </table>
@@ -80,80 +85,13 @@
     <custom-timeline id="timeline" filename="selectedFile.filename" data="auditData" ng-show="auditData" class="col-md-5" set-class-when-at-top="fix-to-top">
     </custom-timeline>
     <!-- END Timeline -->
-
-    <!-- Modal OutputFiles-->
-    <div id="fileDetailModal" class="modal fade" role="dialog">
-      <div class="modal-dialog modal-huge">
-
-        <!-- Modal content-->
-        <div class="modal-content">
-          <div class="modal-header">
-          </div>
-          <div class="modal-body">
-            <div class="panel panel-default">
-              <div class="panel-heading"><h5 class="modal-title">Relación de ficheros de salida generados por {{selectedFile.filename}}</h5></div>
-              <div class="panel-body">
-                <table ng-table="detailTableParams" class="table" show-filter="true">
-                  <tr ng-class="{
-                      'green': outputStates.ok.indexOf(file.outputState) >= 0,
-                      'yellow': outputStates.pending.indexOf(file.outputState) >= 0,
-                      'brown': outputStates.bad.indexOf(file.outputState) >= 0,
-                      'red': outputStates.error.indexOf(file.outputState) >= 0
-                    }" class="animate" ng-repeat="file in $data">
-                    <td title="'Nombre'" filter="{'filename': 'text'}" sortable="'filename'">
-                      <a ng-href="http://{{serverConfig.host}}:{{serverConfig.port}}/api/file/{{distrib.alias}}/{{distrib.code}}/{{file.filename}}">
-                        {{file.filename}}
-                      </a>
-                    </td>
-                    <td title="'Estado'" filter="{'outputState': 'text'}" sortable="'outputState'">
-                      <span ng-if="outputStates.bad.indexOf(file.outputState) < 0">{{file.outputState}}</span>
-                      <a class="" ng-if="outputStates.bad.indexOf(file.outputState) >= 0"
-                         ng-href="http://{{serverConfig.host}}:{{serverConfig.port}}/api/file/{{distrib.alias}}/{{distrib.code}}/{{file.filename}}.bad2">
-                        {{file.outputState}}
-                      </a>
-                    </td>
-                    <td title="'Últ. Actualización'" filter="{ creationDate: 'text'}" sortable="'creationDate'">
-                      {{file.creationDate | date:"dd/MM/yyyy 'a las' HH:mm"}}
-                    </td>
-                  </tr>
-                </table>
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
-            <button type="button" class="btn btn-default" data-dismiss="modal" ng-if="canSetReviewedFile" ng-click="confirmReview()">Revisado</button>
-          </div>
-        </div>
-
-      </div>
-    </div>
-    <!-- END MODAL -->
-
-    <!-- Modal Confirm -->
-    <div id="confirmReviewModal" class="modal fade" role="dialog">
-      <div class="modal-dialog modal-sm">
-
-        <!-- Modal content-->
-        <div class="modal-content">
-          <form name="review" novalidate>
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal">&times;</button>
-              <h4 class="modal-title">Añadir un comentario para forzar esta transición.</h4>
-            </div>
-            <div class="modal-body">
-              <textarea placeholder="Comentario..." name="comment" ng-model="comment" style="min-width: 100%" required></textarea>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
-              <button type="button" class="btn btn-default" ng-show="review.comment.$invalid" disabled>Confirmar</button>
-              <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="setReviewed()" ng-show="review.comment.$valid">Confirmar</button>
-            </div>
-          </form>
-        </div>
-
-      </div>
-    </div>
-    <!-- END MODAL -->
   </div>
+
+
+
+  <div ng-show="loading" class="col-md-12 vert-offset-top-6 vert-offset-bottom-2 text-center">
+    <img src="images/loader.gif" />
+    <p><strong>Procesando ficheros..</strong></p>
+  </div>
+
 </div>

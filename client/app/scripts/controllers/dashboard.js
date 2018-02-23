@@ -2,21 +2,21 @@
 
 /**
  * @ngdoc function
- * @name meanApp.controller:MainCtrl
+ * @name csAdministratorApp.controller:MainCtrl
  * @description
  * # MainCtrl
- * Controller of the meanApp
+ * Controller of the csAdministratorApp
  */
-angular.module('meanApp')
+angular.module('csAdministratorApp')
   .controller('DashboardCtrl', function ($scope, $rootScope, $http, _) {
 
     $scope.periodos = [
       {alias: 'Última semana', apiPath:'lastWeek', days:7},
       {alias: 'Últimas dos semanas', apiPath:'lastTwoWeeks', days:15}
     ];
-  
+
     $scope.period = $scope.periodos[1];
-    
+
     $scope.distribArray = [{codigo: '0111', nombre: 'UDESA', reqAtencion:11},
                            {codigo: '0188', nombre: 'Eléctrica de Gayoso', reqAtencion:5},
                            {codigo: '0183', nombre: 'Eléctrica de Cabalar', reqAtencion:2},
@@ -24,23 +24,23 @@ angular.module('meanApp')
                            {codigo: '0302', nombre: 'Eléctrica de Zas', reqAtencion:1},
                            {codigo: '0655', nombre: 'Eléctrica de Valdriz', reqAtencion:12},
                            {codigo: '0432', nombre: 'Eléctrica de Foxo', reqAtencion:19}
-                          ];  
-  
+                          ];
+
     $scope.changeDistrib = function (index){
       $rootScope.distrib = $rootScope.distribuidoras[index];
       refreshCharts();
     }
-    
+
     $scope.changePeriod = function(index){
       $scope.period = $scope.periodos[index];
       refreshCharts();
     }
-    
-    
+
+
     // *********************************************************************************************************************
     // Funciones auxiliares ------------------------------------------------------------------------------------------------
-    
-    
+
+
     function refreshCharts(){
       if(!$rootScope.distrib.alias)
         return;
@@ -53,8 +53,8 @@ angular.module('meanApp')
         }
       );
     }
-    
-    
+
+
     function updatePieChart(data){
       var states = _.groupBy(data, function(fichero){return fichero.metadata.estado || 'Sin estado'});
       $scope.stateChartLabels = Object.keys(states);
@@ -64,10 +64,10 @@ angular.module('meanApp')
         stateCounter.push(states[state].length);
       });
       $scope.stateChartData = stateCounter;
-      $scope.stateChartType = 'Pie';      
+      $scope.stateChartType = 'Pie';
     }
-  
-  
+
+
     function updateEvolveStateChart(data){
       var chartData = [], day, states, state, fileStatesIndex, daysIndex;
       var fileStates = ['REE_CONFIRMADO_OK', 'REE_CONFIRMADO_BAD2', 'REE_PDTE_CONFIRMACION',
@@ -104,8 +104,8 @@ angular.module('meanApp')
         console.log(points, evt);
       };
     }
-  
-    
+
+
     function fillDatesWithoutFiles(days){
       var endPeriod = new Date(); //Now
       var startPeriod = new Date();
@@ -123,8 +123,8 @@ angular.module('meanApp')
       }
       return result;
     }
-    
-  
+
+
     function getStatesColours(states){
       return states.map(function(label){
         switch(label){
@@ -145,7 +145,7 @@ angular.module('meanApp')
         }
       });
     }
-  
-  
+
+
   });
 

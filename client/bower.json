@@ -2,29 +2,22 @@
   "name": "mean",
   "version": "0.0.0",
   "dependencies": {
-    "angular": "^1.4.0",
-    "bootstrap": "^3.2.0",
-    "angular-animate": "^1.4.0",
-    "angular-cookies": "^1.4.0",
-    "angular-messages": "^1.4.0",
-    "angular-resource": "^1.4.0",
-    "angular-route": "^1.4.0",
-    "angular-sanitize": "^1.4.0",
-    "angular-touch": "^1.4.0",
+    "angular": "^1.6.0",
+    "angular-animate": "^1.6.0",
+    "angular-cookies": "^1.6.0",
+    "angular-route": "^1.6.0",
     "ng-table": "^0.8.3",
     "ng-bs-daterangepicker": "^0.0.5",
     "angular-locale_es-es": "*",
     "angular-chart.js": "^0.8.8",
     "underscore": "^1.8.3",
-    "angular-bootstrap": "^1.1.2",
+    "angular-bootstrap": "^2.4.0",
     "Bootflat": "^2.0.4",
-    "angular-md5": "^0.1.10"
-  },
-  "devDependencies": {
-    "angular-mocks": "^1.4.0"
+    "angular-md5": "^0.1.10",
+    "SVG-Loaders": "svg-loaders#^1.0.2"
   },
   "appPath": "app",
-  "moduleName": "meanApp",
+  "moduleName": "csAdministratorApp",
   "overrides": {
     "bootstrap": {
       "main": [

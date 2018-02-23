@@ -2,18 +2,18 @@
 
 /**
  * @ngdoc function
- * @name meanApp.controller:RootCtrl
+ * @name csAdministratorApp.controller:RootCtrl
  * @description
  * # RootCtrl
- * Controller of the meanApp
+ * Controller of the csAdministratorApp
  */
-angular.module('meanApp')
+angular.module('csAdministratorApp')
   .controller('RootCtrl', function ($rootScope, $window, $cookies) {
 
 
-    //$rootScope.serverConfig = {host: '192.168.246.153', port: 9000};
+    $rootScope.serverConfig = {host: '192.168.246.153', port: 9000};
 
-    $rootScope.serverConfig = {host: '192.168.234.12', port: 3000};
+    //$rootScope.serverConfig = {host: '192.168.234.12', port: 3000};
 
 
     $rootScope.distribuidoras = [

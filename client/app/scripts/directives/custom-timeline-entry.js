@@ -3,7 +3,7 @@
  * Created by ricardo on 13/04/16.
  */
 
-angular.module('meanApp').directive('customTimelineEntry', function(){
+angular.module('csAdministratorApp').directive('customTimelineEntry', function(){
   return {
     restrict: 'E',
     templateUrl: 'views/directives/custom-timeline-entry.html',
