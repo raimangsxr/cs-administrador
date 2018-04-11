@@ -12,41 +12,44 @@ router.get('/:distribAlias/:distribCode/:filename', function(req, res) {
     MongoClient.connect('mongodb://'+config.dbUser+':'+config.dbPass+'@'+config.dbIp+':'+config.dbPort+'/'
         +req.params.distribAlias+'-database?authSource='+req.params.distribAlias+'-database',
         function(err, db) {
-          var bucket = new GridFSBucket(db, { bucketName: 'inputFs' });
-          var downloadStream = bucket.openDownloadStreamByName(req.params.filename);
-          downloadStream.on('error', function(err) {
-            var errorType = err.message.split(':')[0];
-            if (!errorType === 'FileNotFound') {
-              console.error(err.message);
-              res.status(500).send(err.message);
-            }
-            bucket = new GridFSBucket(db, { bucketName: 'outputFs' });
-            downloadStream = bucket.openDownloadStreamByName(req.params.filename);
+          try{
+            var bucket = new GridFSBucket(db, { bucketName: 'inputFs' });
+            var downloadStream = bucket.openDownloadStreamByName(req.params.filename);
             downloadStream.on('error', function(err) {
-              console.error(err.message);
               var errorType = err.message.split(':')[0];
-              if (errorType === 'FileNotFound')
-                res.status(404).send(err.message);
-              else
+              if (!errorType === 'FileNotFound') {
+                console.error(err.message);
                 res.status(500).send(err.message);
+              }
+              bucket = new GridFSBucket(db, { bucketName: 'outputFs' });
+              downloadStream = bucket.openDownloadStreamByName(req.params.filename);
+              downloadStream.on('error', function(err) {
+                console.error(err.message);
+                var errorType = err.message.split(':')[0];
+                if (errorType === 'FileNotFound')
+                  res.status(404).send(err.message);
+                else
+                  res.status(500).send(err.message);
+              });
+              console.log('Retrieve from OutputFS: ' + req.params.filename);
+              res.setHeader('Content-Type', 'application/octet-stream');
+              if(hasFileCompression(req.params.filename))
+                downloadStream.pipe(bz2()).pipe(res);
+              else
+                downloadStream.pipe(res);
             });
-            console.log('Retrieve from OutputFS: ' + req.params.filename);
+            console.log('Retrieve from InputFS: ' + req.params.filename);
             res.setHeader('Content-Type', 'application/octet-stream');
             if(hasFileCompression(req.params.filename))
               downloadStream.pipe(bz2()).pipe(res);
             else
               downloadStream.pipe(res);
-          });
-          console.log('Retrieve from InputFS: ' + req.params.filename);
-          res.setHeader('Content-Type', 'application/octet-stream');
-          if(hasFileCompression(req.params.filename))
-            downloadStream.pipe(bz2()).pipe(res);
-          else
-            downloadStream.pipe(res);
+          } catch (error){
+            processError(res, error);
+          }
         });
   } catch (error){
-    console.error(error);
-    res.status(500).send(error);
+    processError(res, error);
   }
 });
 
@@ -63,6 +66,12 @@ function hasFileCompression(filename){
     return false;
   }
   return true;
+}
+
+
+function processError(res, error){
+  console.error(error);
+  res.status(500).send(error);
 }
 
 
