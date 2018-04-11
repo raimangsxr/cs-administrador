@@ -72,6 +72,11 @@ angular
         controller: 'AuditCtrl',
         controllerAs: 'audit'
       })
+      .when('/check', {
+        templateUrl: 'views/check/check.html',
+        controller: 'CheckCtrl',
+        controllerAs: 'check'
+      })
       .otherwise({
         redirectTo: '/Login'
       });

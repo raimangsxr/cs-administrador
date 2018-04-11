@@ -41,8 +41,7 @@
   </div>
 
 
-
-  <div ng-show="!loading" class="col-md-12 vert-offset-top-2 vert-offset-bottom-6">
+  <div ng-show="!loading && !error" class="col-md-12 vert-offset-top-2 vert-offset-bottom-6">
     <div id="list" class="col-md-12 animate">
       <div class="panel panel-primary">
         <div class="panel-heading"><h3 class="panel-title">Registro de entrada</h3></div>
@@ -92,6 +91,11 @@
   <div ng-show="loading" class="col-md-12 vert-offset-top-6 vert-offset-bottom-2 text-center">
     <img src="images/loader.gif" />
     <p><strong>Procesando ficheros..</strong></p>
+  </div>
+
+
+  <div ng-show="!loading && error" class="col-md-12 vert-offset-top-6 vert-offset-bottom-2 text-center">
+    <div class="col-md-offset-3 col-md-6 alert alert-danger" role="alert">Se han producido errores en la carga de datos de BD</div>
   </div>
 
 </div>

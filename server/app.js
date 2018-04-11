@@ -10,6 +10,7 @@ var mongo = require('./routes/mongo');
 var gridFs = require('./routes/gridFs');
 var audit = require('./routes/audit');
 var user = require('./routes/user');
+var check = require('./routes/check');
 
 var app = express();
 
@@ -35,6 +36,7 @@ app.use('/api/query', mongo);
 app.use('/api/file', gridFs);
 app.use('/api/audit', audit);
 app.use('/api/login', user);
+app.use('/api/check', check);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

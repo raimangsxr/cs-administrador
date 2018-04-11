@@ -1,0 +1,29 @@
+<div>
+  <div class="text-center">
+    <h3><label class="label label-default">Comprobaciones: {{distrib.name}}</label></h3>
+  </div>
+  <div class="col-md-12 text-center vert-offset-top-1">
+    <div class="btn-group">
+      <button class="btn btn-default" ng-class="{'btn-primary': d === distrib}" ng-repeat="d in distribuidoras" ng-click="changeDistrib($index)">{{d.alias|uppercase}}</button>
+    </div>
+  </div>
+  <div class="col-md-12 filter_row">
+    <div class="col-md-4 text-right">
+      <label class="btn btn-default disabled">Comprobaciones disponibles</label>
+    </div>
+    <div class="btn-group col-md-8">
+      <button class="btn btn-default" ng-click="check_selected = 1">Agregaciones de alta sin medida</button>
+      <button class="btn btn-default" ng-click="check_selected = 2">Medidas por agregación</button>
+    </div>
+  </div>
+
+
+  <div class="col-md-12 vert-offset-top-2 vert-offset-bottom-6">
+    <div class="col-md-12 animate">
+      <check-ags-without-measure ng-show="check_selected == 1" distrib="distrib"></check-ags-without-measure>
+      <check-ags-measure ng-show="check_selected == 2" distrib="distrib"></check-ags-measure>
+
+    </div>
+  </div>
+
+</div>

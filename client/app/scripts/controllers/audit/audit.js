@@ -11,6 +11,7 @@ angular.module('csAdministratorApp')
   .controller('AuditCtrl', function ($scope, $rootScope, $http, $log, $q, $cookies, $uibModal, _, NgTableParams) {
     $scope.auditOutputData = [];
     $scope.selectedFile = {};
+    $scope.error = false;
 
     // BALD lost tolerance in percent
     $scope.BALD_tolerance = 15;
@@ -76,12 +77,14 @@ angular.module('csAdministratorApp')
     $scope.selectFile = function(file, index){
       $scope.idSelectedFile = index;
       $scope.selectedFile = file;
+      $scope.error = false;
       $http.get('http://'+$rootScope.serverConfig.host+':'+$rootScope.serverConfig.port+'/api/audit/'+$rootScope.distrib.alias+'/'+file.filename).then(
         function(response){
           playAnimations();
           $scope.auditData = response.data;
         }, function(error){
           console.log(error);
+          $scope.error = true;
       });
     };
 
@@ -89,6 +92,7 @@ angular.module('csAdministratorApp')
       if(!$rootScope.distrib.alias)
         return;
       $scope.loading = true;
+      $scope.error = false;
       $http.get('http://'+$rootScope.serverConfig.host+':'+$rootScope.serverConfig.port+'/api/audit/'.concat($rootScope.distrib.alias)).then(
         function(response){
           var files = response.data;
@@ -133,10 +137,13 @@ angular.module('csAdministratorApp')
             },
             function(err){
               $scope.loading = false;
+              $scope.error = true;
               $log.error(JSON.stringify(err));
             }
           );
         }, function(err){
+          $scope.loading = false;
+          $scope.error = true;
           $log.error(JSON.stringify(err));
       });
     };
