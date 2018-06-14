@@ -6,6 +6,25 @@ var id = mongoskin.helper.toObjectID;
 var router = express.Router();
 
 
+router.get('/objecion-intercambio-distribuidor/:distrib/:id', function (req, res, next) {
+    try {
+        var a = 1;
+        var db = mongoskin.db('mongodb://' + config.dbUser + ':' + config.dbPass + '@' + config.dbIp + ':' + config.dbPort
+          + '/' + req.params.distrib + '-database?authSource=' + req.params.distrib + '-database', {safe: true});
+        db.collection(config.objeCollectionName)
+          .find({gridFileId:req.params.id})
+          .toArray(function (e, results) {
+              if (e) return next(e);
+              db.close();
+              res.send(results);
+          });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send(error);
+    }
+});
+
+
 /* GET all collection list. */
 router.get('/:distrib/:collection', function(req, res, next) {
     try {

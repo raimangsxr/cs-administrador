@@ -215,8 +215,12 @@ angular.module('csAdministratorApp')
       var notProcessed = [];
       files.forEach(function(file){
         if (file.fileType.toUpperCase() === 'BALD') {
-          promises.push(_getAndParseBald(file));
-          return
+          if (file.details){ //no need to get the file to calculate details
+            file.inputState = _parseBaldState(file);
+          }
+          else {
+            promises.push(_getAndParseBald(file));
+          }
         }
         /*
         if (file.fileType.toUpperCase() === 'CIERRES') {
@@ -244,17 +248,30 @@ angular.module('csAdministratorApp')
       $http.get(file.link).then(
         function (response) {
           var fields = response.data.trim().split(';');
-          file.demand = fields[15];
-          file.adquisition = fields[16];
-          file.lost = fields[17];
-          file.lost_percent = fields[18];
-          if((file.lost_percent < 0 || file.lost_percent > $scope.BALD_tolerance) && !file.revisado)
-            file.inputState = 'PROCESADO_INCORRECTO_PDTE_INFORME';
+          file.details = {};
+          file.details.demand = parseInt(fields[15]);
+          file.details.adquisition = parseInt(fields[16]);
+          file.details.lost = parseInt(fields[17]);
+          file.details.lost_percent = parseFloat(fields[18]);
+          _updateAudit(angular.copy(file));
+          file.inputState = _parseBaldState(file);
           deferred.resolve(file);
         }, function (err) {
           $log.error(JSON.stringify(err));
         });
       return deferred.promise;
+    }
+
+    function _parseBaldState(file){
+      if((file.details.lost_percent < 0 || file.details.lost_percent > $scope.BALD_tolerance) && !file.revisado)
+        return file.inputState = 'PROCESADO_INCORRECTO_PDTE_INFORME';
+      return file.inputState;
+    }
+
+    function _updateAudit(file){
+      $http.put(
+        'http://' + $rootScope.serverConfig.host + ':' + $rootScope.serverConfig.port + '/api/audit/' + $rootScope.distrib.alias + '/' + file._id, file
+      );
     }
 
     /* ------- END AUX Functions ---------*/

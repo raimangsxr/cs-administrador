@@ -3,6 +3,7 @@ var mongoskin = require('mongoskin');
 var config = require('../config');
 
 var id = mongoskin.helper.toObjectID;
+var isodate = mongoskin.helper.toISOString;
 var router = express.Router();
 
 
@@ -79,6 +80,25 @@ router.post('/:distrib', function(req, res, next) {
                 db.close();
                 res.status(200).json({"result": "ok"});
             });
+        });
+    } catch (error){
+        console.error(error);
+        res.status(500).send(error);
+    }
+});
+
+
+router.put('/:distrib/:id', function(req, res, next) {
+    try {
+        var fileData = req.body;
+        delete fileData._id;
+        fileData.creationDate = new Date(fileData.creationDate);
+        var db = mongoskin.db('mongodb://' + config.dbUser + ':' + config.dbPass + '@' + config.dbIp + ':' + config.dbPort + '/'
+          + req.params.distrib + '-database?authSource=' + req.params.distrib + '-database', {safe: true});
+        db.collection(config.auditCollectionName).update({_id: id(req.params.id)}, fileData, function (error) {
+            if (error) return next(error);
+            db.close();
+            res.status(200).json({"result": "ok"});
         });
     } catch (error){
         console.error(error);

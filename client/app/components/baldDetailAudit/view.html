@@ -5,22 +5,22 @@
   <div class="modal-body">
     <div class="row vert-offset-top-3">
       <div class="col-md-4 text-right"><strong>Adquisición</strong></div>
-      <div class="col-md-8 text-left">{{$ctrl.file.adquisition | number}} kWh</div>
+      <div class="col-md-8 text-left">{{$ctrl.file.details.adquisition | number}} kWh</div>
     </div>
     <div class="row">
       <div class="col-md-4 text-right "><strong>Demanda</strong></div>
-      <div class="col-md-8 text-left">{{$ctrl.file.demand | number}} kWh</div>
+      <div class="col-md-8 text-left">{{$ctrl.file.details.demand | number}} kWh</div>
     </div>
     <div class="row">
       <div class="col-md-offset-2 col-md-4"><hr></div>
     </div>
     <div class="row">
       <div class="col-md-4 text-right"><strong>Pérdidas</strong></div>
-      <div class="col-md-8 text-left">{{$ctrl.file.lost | number}} kWh</div>
+      <div class="col-md-8 text-left">{{$ctrl.file.details.lost | number}} kWh</div>
     </div>
     <div class="row">
       <div class="col-md-4 text-right"><strong>Pérdidas (%)</strong></div>
-      <div class="col-md-8 text-left">{{$ctrl.file.lost_percent | number : 2}} %</div>
+      <div class="col-md-8 text-left">{{$ctrl.file.details.lost_percent | number : 2}} %</div>
     </div>
   </div>
   <div class="modal-footer">

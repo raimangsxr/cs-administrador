@@ -2,11 +2,16 @@ module.exports = {
   /* Servers */
   dbUser: 'csadmin',
   dbPass: 'csp455',
-  dbIp: '192.168.246.151',
+  dbIp: '192.168.5.151',
   //dbIp: '192.168.0.150',
   dbPort: '27017',
 
   auditCollectionName: 'entradaAuditoria',
+  inputFsCollectionName: 'inputFs.files',
+  objeCollectionName: 'objecionIntercambioDistribuidor',
+
+  ftpRootDir: '/home',
+  REINTEROBJEDISTRIB_DIR: 'CS-entrada/respuestas-REE-objeciones',
 
   csAdministratorDatabase: 'cs-administrador-database',
 

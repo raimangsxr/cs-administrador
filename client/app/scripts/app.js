@@ -77,6 +77,11 @@ angular
         controller: 'CheckCtrl',
         controllerAs: 'check'
       })
+      .when('/operation', {
+        templateUrl: 'views/operation/operation.html',
+        controller: 'OperationCtrl',
+        controllerAs: 'operation'
+      })
       .otherwise({
         redirectTo: '/Login'
       });

@@ -1,11 +1,12 @@
 var express = require('express');
 var router = express.Router();
 var mongo = require('mongodb');
+var mongoskin = require('mongoskin');
 var bz2 = require('unbzip2-stream');
 var config = require('../config');
 var MongoClient = mongo.MongoClient;
 var GridFSBucket = mongo.GridFSBucket;
-
+var id = mongoskin.helper.toObjectID;
 
 router.get('/:distribAlias/:distribCode/:filename', function(req, res) {
   try{
@@ -50,6 +51,25 @@ router.get('/:distribAlias/:distribCode/:filename', function(req, res) {
   }
 });
 
+
+router.put('/:distrib/:filename', function(req, res, next) {
+  try {
+    var fileData = req.body;
+    var _id = fileData._id;
+    delete fileData._id;
+    fileData.uploadDate = new Date(fileData.uploadDate);
+    var db = mongoskin.db('mongodb://' + config.dbUser + ':' + config.dbPass + '@' + config.dbIp + ':' + config.dbPort + '/'
+      + req.params.distrib + '-database?authSource=' + req.params.distrib + '-database', {safe: true});
+    db.collection(config.inputFsCollectionName).update({_id: id(_id)}, fileData, function (error) {
+      if (error) return next(error);
+      db.close();
+      res.status(200).json({"result": "ok"});
+    });
+  } catch (error){
+    console.error(error);
+    res.status(500).send(error);
+  }
+});
 
 
 /* ----------------AUXILIAR FUNCTIONS  --------------------------------------------------------------------------------------------------------------*/
