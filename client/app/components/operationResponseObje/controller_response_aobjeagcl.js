@@ -11,7 +11,7 @@
  * Controller of the csAdministratorApp
  */
 angular.module('csAdministratorApp')
-  .controller('OperationResponseObjeModalCtrl', ['$rootScope', '$scope', '$log', '$http', '$cookies', '$uibModal', '$uibModalInstance', '$q', 'file', function ($rootScope, $scope, $log, $http, $cookies, $uibModal, $uibModalInstance, $q, file) {
+  .controller('OperationResponseOBJEINMECtrl', ['$rootScope', '$scope', '$log', '$http', '$cookies', '$uibModal', '$uibModalInstance', '$q', 'file', function ($rootScope, $scope, $log, $http, $cookies, $uibModal, $uibModalInstance, $q, file) {
 
     $scope.file = file;
     $scope.responses = {};
@@ -20,22 +20,51 @@ angular.module('csAdministratorApp')
       $uibModalInstance.close();
     };
 
-    _getAndParseObje(file).then(
-      function (parsedFile){
-        $scope.objes = parsedFile.metadata.details.filter(function(obje){
-          return obje.motivo === "700" || obje.motivo === "800"
-        });
-        $scope.objes.forEach(function(obje){
-          $scope.responses[obje.cups] = {};
-          $scope.responses[obje.cups].aceptado = null;
-          $scope.responses[obje.cups].segundoComer = '9999';
-          $scope.responses[obje.cups].comentarioRespuesta = null;
-        });
-      },
-      function (error){
-        $log.error(JSON.stringify(error));
-      }
-    )
+    switch (file.metadata.fileType) {
+      case "15OBJEINME":
+      case "OBJEINME":
+        _getAndParseOBJEINME(file).then(
+          function (parsedFile){
+            $scope.objes = parsedFile.metadata.details.filter(function(obje){
+              return obje.motivo === "700" || obje.motivo === "800"
+            });
+            $scope.objes.forEach(function(obje){
+              $scope.responses[obje.cups] = {};
+              $scope.responses[obje.cups].aceptado = null;
+              $scope.responses[obje.cups].segundoComer = '9999';
+              $scope.responses[obje.cups].comentarioRespuesta = null;
+            });
+          },
+          function (error){
+            $log.error(JSON.stringify(error));
+          }
+        )
+        break;
+      case "15AOBJEAGCL":
+      case "AOBJEAGCL":
+        _getAndParseAOBJEAGCL(file).then(
+          function (parsedFile){
+            $scope.objes = parsedFile.metadata.details.filter(function(obje){
+              return obje.motivo === "700" || obje.motivo === "800"
+            });
+            $scope.objes.forEach(function(obje){
+              $scope.responses[obje.agregacion] = {};
+              $scope.responses[obje.agregacion].aceptado = null;
+              $scope.responses[obje.agregacion].segundoComer = '9999';
+              $scope.responses[obje.agregacion].comentarioRespuesta = null;
+            });
+          },
+          function (error){
+            $log.error(JSON.stringify(error));
+          }
+        )
+        break;
+    }
+
+
+
+
+
 
     $scope.setResponse = function () {
       delete file.link;
@@ -70,7 +99,7 @@ angular.module('csAdministratorApp')
     };
 
 
-    function _getAndParseObje(file){
+    function _getAndParseOBJEINME(file){
       var deferred = $q.defer();
       if(file.metadata.hasOwnProperty('details')) {
         deferred.resolve(file);
@@ -92,6 +121,39 @@ angular.module('csAdministratorApp')
               obje_detail.comentario = fields[6];
               obje_detail.objeAAutoObje = fields[7];
               file.metadata.details.push(obje_detail);
+            });
+            _updateInputFile(angular.copy(file));
+            deferred.resolve(file);
+          }, function (err) {
+            $log.error(JSON.stringify(err));
+          });
+      }
+      return deferred.promise;
+    }
+
+    function _getAndParseAOBJEAGCL(file){
+      var deferred = $q.defer();
+      if(file.metadata.hasOwnProperty('details')) {
+        deferred.resolve(file);
+      }
+      else {
+        $http.get(file.link).then(
+          function (response) {
+            file.metadata.details = [];
+            var file_lines = response.data.trim().split('\n');
+            file_lines.forEach(function(line){
+              var fields = line.trim().split(';');
+              var AOBJEAGCL_detail = {};
+              AOBJEAGCL_detail.id_objecion = fields[0];
+              AOBJEAGCL_detail.agregacion = fields[1]+';'+fields[2]+';'+fields[3]+';'+fields[4]+';'+fields[5]+';'+fields[6]+';'+fields[7];
+              AOBJEAGCL_detail.fechaInicio = fields[8];
+              AOBJEAGCL_detail.fechaFin = fields[9];
+              AOBJEAGCL_detail.motivo = fields[10];
+              AOBJEAGCL_detail.publicado = parseInt(fields[11]);
+              AOBJEAGCL_detail.propuesto = parseInt(fields[12]);
+              AOBJEAGCL_detail.comentario = fields[13];
+              AOBJEAGCL_detail.objeAAutoObje = fields[14];
+              file.metadata.details.push(AOBJEAGCL_detail);
             });
             _updateInputFile(angular.copy(file));
             deferred.resolve(file);

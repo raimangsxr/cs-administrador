@@ -1,0 +1,239 @@
+/**
+ * Created by rromani on 21/02/18.
+ */
+'use strict';
+
+/**
+ * @ngdoc function
+ * @name csAdministratorApp.controller:DetailBaldCtrl
+ * @description
+ * # AuditCtrl
+ * Controller of the csAdministratorApp
+ */
+angular.module('csAdministratorApp')
+  .controller('OperationResponseObjeModalCtrl', ['$rootScope', '$scope', '$log', '$http', '$cookies', '$uibModal', '$uibModalInstance', '$q', 'file', function ($rootScope, $scope, $log, $http, $cookies, $uibModal, $uibModalInstance, $q, file) {
+
+    $scope.file = file;
+    $scope.responses = {};
+
+    $scope.close = function(){
+      $uibModalInstance.close();
+    };
+
+    switch (file.metadata.fileType) {
+      case "15OBJEINME":
+      case "OBJEINME":
+        _getAndParseOBJEINME(file).then(
+          function (parsedFile){
+            $scope.objes = parsedFile.metadata.details.filter(function(obje){
+              return obje.motivo === "700" || obje.motivo === "800"
+            });
+            $scope.objes.forEach(function(obje){
+              $scope.responses[obje.cups] = {};
+              $scope.responses[obje.cups].aceptado = null;
+              $scope.responses[obje.cups].segundoComer = '9999';
+              $scope.responses[obje.cups].comentarioRespuesta = null;
+            });
+          },
+          function (error){
+            $log.error(JSON.stringify(error));
+          }
+        )
+        break;
+      case "15AOBJEAGCL":
+      case "AOBJEAGCL":
+        _getAndParseAOBJEAGCL(file).then(
+          function (parsedFile){
+            $scope.objes = parsedFile.metadata.details.filter(function(obje){
+              return obje.motivo === "700" || obje.motivo === "800"
+            });
+            $scope.objes.forEach(function(obje){
+              $scope.responses[obje.agregacion] = {};
+              $scope.responses[obje.agregacion].aceptado = null;
+              $scope.responses[obje.agregacion].segundoComer = '9999';
+              $scope.responses[obje.agregacion].comentarioRespuesta = null;
+            });
+          },
+          function (error){
+            $log.error(JSON.stringify(error));
+          }
+        )
+        break;
+    }
+
+
+
+
+
+
+    $scope.setResponse = function () {
+      delete file.link;
+
+      var fileMetadataWithResponses = $scope.objes.map(function(obje){
+        var response = $scope.responses[obje.cups];
+        Object.assign(obje, response); // Mergeamos las propiedades de ambos
+        return obje;
+      });
+
+      _getReinterobjeData(file._id, file.filename, fileMetadataWithResponses).then(
+        function(generateFiles){
+          $http.post(
+            'http://' + $rootScope.serverConfig.host + ':' + $rootScope.serverConfig.port + '/api/operation/response-obje/' + $rootScope.distrib.alias,
+            generateFiles
+          ).then(
+            function (response) {
+              file.metadata.fechaRevisionManual = new Date().toISOString();
+              _updateInputFile(file);
+              $uibModalInstance.close(true);
+            },
+            function (error) {
+              $log.error(error);
+              $uibModalInstance.close(false);
+            }
+          );
+        },
+        function(error){
+          log.error(JSON.stringify(error));
+        }
+      );
+    };
+
+
+    function _getAndParseOBJEINME(file){
+      var deferred = $q.defer();
+      if(file.metadata.hasOwnProperty('details')) {
+        deferred.resolve(file);
+      }
+      else {
+        $http.get(file.link).then(
+          function (response) {
+            file.metadata.details = [];
+            var file_lines = response.data.trim().split('\n');
+            file_lines.forEach(function(line){
+              var fields = line.trim().split(';');
+              var obje_detail = {};
+              obje_detail.cups = fields[0];
+              obje_detail.fechaInicio = fields[1];
+              obje_detail.fechaFin = fields[2];
+              obje_detail.motivo = fields[3];
+              obje_detail.publicado = parseInt(fields[4]);
+              obje_detail.propuesto = parseInt(fields[5]);
+              obje_detail.comentario = fields[6];
+              obje_detail.objeAAutoObje = fields[7];
+              file.metadata.details.push(obje_detail);
+            });
+            _updateInputFile(angular.copy(file));
+            deferred.resolve(file);
+          }, function (err) {
+            $log.error(JSON.stringify(err));
+          });
+      }
+      return deferred.promise;
+    }
+
+    function _getAndParseAOBJEAGCL(file){
+      var deferred = $q.defer();
+      if(file.metadata.hasOwnProperty('details')) {
+        deferred.resolve(file);
+      }
+      else {
+        $http.get(file.link).then(
+          function (response) {
+            file.metadata.details = [];
+            var file_lines = response.data.trim().split('\n');
+            file_lines.forEach(function(line){
+              var fields = line.trim().split(';');
+              var AOBJEAGCL_detail = {};
+              AOBJEAGCL_detail.id_objecion = fields[0];
+              AOBJEAGCL_detail.agregacion = fields[1]+';'+fields[2]+';'+fields[3]+';'+fields[4]+';'+fields[5]+';'+fields[6]+';'+fields[7];
+              AOBJEAGCL_detail.fechaInicio = fields[8];
+              AOBJEAGCL_detail.fechaFin = fields[9];
+              AOBJEAGCL_detail.motivo = fields[10];
+              AOBJEAGCL_detail.publicado = parseInt(fields[11]);
+              AOBJEAGCL_detail.propuesto = parseInt(fields[12]);
+              AOBJEAGCL_detail.comentario = fields[13];
+              AOBJEAGCL_detail.objeAAutoObje = fields[14];
+              file.metadata.details.push(AOBJEAGCL_detail);
+            });
+            _updateInputFile(angular.copy(file));
+            deferred.resolve(file);
+          }, function (err) {
+            $log.error(JSON.stringify(err));
+          });
+      }
+      return deferred.promise;
+    }
+
+    function _updateInputFile(file){
+      delete file.link;
+      $http.put(
+        'http://' + $rootScope.serverConfig.host + ':' + $rootScope.serverConfig.port + '/api/file/' + $rootScope.distrib.alias + '/' + file.filename, file
+      );
+    }
+
+
+    function _getReinterobjeData(fileId, filename, objesMetadata){
+      var deferred = $q.defer();
+      $http.get('http://' + $rootScope.serverConfig.host + ':' + $rootScope.serverConfig.port + '/api/query/objecion-intercambio-distribuidor/'+ $rootScope.distrib.alias + '/' + fileId).then(
+        function (response) {
+          var filename_fields = filename.split('_');
+          var responseData = {};
+          var responseObjesData = objesMetadata.map(function(obje){
+            var objeDocument = response.data.filter(function(doc) {return doc.cups === obje.cups})[0];
+            return [
+              objeDocument._id,
+              objeDocument.codDistribuidor,
+              objeDocument.codTipoPunto,
+              objeDocument.codComercializador,
+              objeDocument.cups,
+              null,
+              null,
+              null,
+              null,
+              obje.fechaInicio,
+              obje.fechaFin,
+              obje.publicado,
+              obje.propuesto,
+              obje.motivo,
+              obje.comentario,
+              null,
+              objeDocument.acuseRecibo,
+              obje.aceptado,
+              obje.comentarioRespuesta,
+              'N'
+            ].join(';');
+          });
+          var generateFiles = {};
+          responseObjesData.forEach(function(obje){
+            var segundoComer = objesMetadata.filter(function(objeMeta){return obje.split(';')[4] === objeMeta.cups})[0].segundoComer;
+            var responseFilename = [
+                'REINTEROBJEDISTRIB',
+                filename_fields[0],
+                filename_fields[1],
+                filename_fields[2],
+                segundoComer,
+                filename_fields[3],
+                new Date().getFullYear().toString()+((new Date().getMonth()+1<10)?'0'+(new Date().getMonth()+1).toString():(new Date().getMonth()+1).toString())+new Date().getDate().toString()
+            ].join('_')+'.100';
+            if(generateFiles.hasOwnProperty(responseFilename)) {
+              generateFiles[responseFilename].data.push(obje);
+            }
+            else {
+              generateFiles[responseFilename] = {};
+              generateFiles[responseFilename].filename = responseFilename;
+              generateFiles[responseFilename].data = [obje];
+            }
+          });
+          var result = [];
+          for (var file in generateFiles){
+            result.push(generateFiles[file])
+          }
+          deferred.resolve(result);
+        }, function (err) {
+          $log.error(JSON.stringify(err));
+        });
+      return deferred.promise;
+    }
+
+  }]
+  );
