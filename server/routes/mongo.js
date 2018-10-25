@@ -25,6 +25,27 @@ router.get('/objecion-intercambio-distribuidor/:distrib/:id', function (req, res
 });
 
 
+router.get('/last-file-by-input-filename/:distrib/:filename', function (req, res, next) {
+  try {
+    var a = 1;
+    var db = mongoskin.db('mongodb://' + config.dbUser + ':' + config.dbPass + '@' + config.dbIp + ':' + config.dbPort
+      + '/' + req.params.distrib + '-database?authSource=' + req.params.distrib + '-database', {safe: true});
+    var filenameNoVersion = req.params.filename.split('.')[0];
+    db.collection(config.inputFsCollectionName)
+      .find({filename:{$regex: filenameNoVersion}})
+      .sort({filename:-1}).limit(1)
+      .toArray(function (e, results) {
+        if (e) return next(e);
+        db.close();
+        res.send(results);
+      });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send(error);
+  }
+});
+
+
 /* GET all collection list. */
 router.get('/:distrib/:collection', function(req, res, next) {
     try {

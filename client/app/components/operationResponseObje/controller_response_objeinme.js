@@ -11,7 +11,7 @@
  * Controller of the csAdministratorApp
  */
 angular.module('csAdministratorApp')
-  .controller('OperationResponseObjeModalCtrl', ['$rootScope', '$scope', '$log', '$http', '$cookies', '$uibModal', '$uibModalInstance', '$q', 'file', function ($rootScope, $scope, $log, $http, $cookies, $uibModal, $uibModalInstance, $q, file) {
+  .controller('OperationResponseOBJEINMECtrl', ['$rootScope', '$scope', '$log', '$http', '$cookies', '$uibModal', '$uibModalInstance', '$q', 'file', function ($rootScope, $scope, $log, $http, $cookies, $uibModal, $uibModalInstance, $q, file) {
 
     $scope.file = file;
     $scope.responses = {};
@@ -20,50 +20,22 @@ angular.module('csAdministratorApp')
       $uibModalInstance.close();
     };
 
-    switch (file.metadata.fileType) {
-      case "15OBJEINME":
-      case "OBJEINME":
-        _getAndParseOBJEINME(file).then(
-          function (parsedFile){
-            $scope.objes = parsedFile.metadata.details.filter(function(obje){
-              return obje.motivo === "700" || obje.motivo === "800"
-            });
-            $scope.objes.forEach(function(obje){
-              $scope.responses[obje.cups] = {};
-              $scope.responses[obje.cups].aceptado = null;
-              $scope.responses[obje.cups].segundoComer = '9999';
-              $scope.responses[obje.cups].comentarioRespuesta = null;
-            });
-          },
-          function (error){
-            $log.error(JSON.stringify(error));
-          }
-        )
-        break;
-      case "15AOBJEAGCL":
-      case "AOBJEAGCL":
-        _getAndParseAOBJEAGCL(file).then(
-          function (parsedFile){
-            $scope.objes = parsedFile.metadata.details.filter(function(obje){
-              return obje.motivo === "700" || obje.motivo === "800"
-            });
-            $scope.objes.forEach(function(obje){
-              $scope.responses[obje.agregacion] = {};
-              $scope.responses[obje.agregacion].aceptado = null;
-              $scope.responses[obje.agregacion].segundoComer = '9999';
-              $scope.responses[obje.agregacion].comentarioRespuesta = null;
-            });
-          },
-          function (error){
-            $log.error(JSON.stringify(error));
-          }
-        )
-        break;
-    }
-
-
-
-
+    _getAndParseOBJEINME(file).then(
+      function (parsedFile){
+        $scope.objes = parsedFile.metadata.details.filter(function(obje){
+          return obje.motivo === "700" || obje.motivo === "800"
+        });
+        $scope.objes.forEach(function(obje){
+          $scope.responses[obje.cups] = {};
+          $scope.responses[obje.cups].aceptado = null;
+          $scope.responses[obje.cups].segundoComer = '9999';
+          $scope.responses[obje.cups].comentarioRespuesta = null;
+        });
+      },
+      function (error){
+        $log.error(JSON.stringify(error));
+      }
+    )
 
 
     $scope.setResponse = function () {
@@ -131,38 +103,6 @@ angular.module('csAdministratorApp')
       return deferred.promise;
     }
 
-    function _getAndParseAOBJEAGCL(file){
-      var deferred = $q.defer();
-      if(file.metadata.hasOwnProperty('details')) {
-        deferred.resolve(file);
-      }
-      else {
-        $http.get(file.link).then(
-          function (response) {
-            file.metadata.details = [];
-            var file_lines = response.data.trim().split('\n');
-            file_lines.forEach(function(line){
-              var fields = line.trim().split(';');
-              var AOBJEAGCL_detail = {};
-              AOBJEAGCL_detail.id_objecion = fields[0];
-              AOBJEAGCL_detail.agregacion = fields[1]+';'+fields[2]+';'+fields[3]+';'+fields[4]+';'+fields[5]+';'+fields[6]+';'+fields[7];
-              AOBJEAGCL_detail.fechaInicio = fields[8];
-              AOBJEAGCL_detail.fechaFin = fields[9];
-              AOBJEAGCL_detail.motivo = fields[10];
-              AOBJEAGCL_detail.publicado = parseInt(fields[11]);
-              AOBJEAGCL_detail.propuesto = parseInt(fields[12]);
-              AOBJEAGCL_detail.comentario = fields[13];
-              AOBJEAGCL_detail.objeAAutoObje = fields[14];
-              file.metadata.details.push(AOBJEAGCL_detail);
-            });
-            _updateInputFile(angular.copy(file));
-            deferred.resolve(file);
-          }, function (err) {
-            $log.error(JSON.stringify(err));
-          });
-      }
-      return deferred.promise;
-    }
 
     function _updateInputFile(file){
       delete file.link;
@@ -214,7 +154,7 @@ angular.module('csAdministratorApp')
                 segundoComer,
                 filename_fields[3],
                 new Date().getFullYear().toString()+((new Date().getMonth()+1<10)?'0'+(new Date().getMonth()+1).toString():(new Date().getMonth()+1).toString())+new Date().getDate().toString()
-            ].join('_')+'.100';
+            ].join('_');
             if(generateFiles.hasOwnProperty(responseFilename)) {
               generateFiles[responseFilename].data.push(obje);
             }
@@ -228,10 +168,40 @@ angular.module('csAdministratorApp')
           for (var file in generateFiles){
             result.push(generateFiles[file])
           }
-          deferred.resolve(result);
+          $q.all(result.map(function(file){ return getLastFilename(file.filename)})).then(
+            function(filenames){
+              result = result.map(function(file){
+                var lastVersion = parseInt(filenames.filter(function(filename) { return filename.split('.')[0] === file.filename })[0].split('.')[1]);
+                file.filename = file.filename + '.' + (lastVersion+1).toString();
+                return file;
+              });
+              deferred.resolve(result);
+            },
+            function(err){
+              $log.error(JSON.stringify(err));
+            }
+          )
         }, function (err) {
           $log.error(JSON.stringify(err));
         });
+      return deferred.promise;
+    }
+
+
+
+    function getLastFilename(filename) {
+      var deferred = $q.defer();
+      $http.get('http://' + $rootScope.serverConfig.host + ':' + $rootScope.serverConfig.port + '/api/query/last-file-by-input-filename/'+ $rootScope.distrib.alias + '/' + filename).then(
+        function(response){
+          if (response.data.length > 0)
+            deferred.resolve(response.data[0].filename);
+          else
+            deferred.resolve(filename+'.100');
+        }, function (err) {
+          $log.error(JSON.stringify(err));
+          deferred.reject(err);
+        }
+      );
       return deferred.promise;
     }
 

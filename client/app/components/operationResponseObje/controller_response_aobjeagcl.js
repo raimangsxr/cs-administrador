@@ -11,7 +11,7 @@
  * Controller of the csAdministratorApp
  */
 angular.module('csAdministratorApp')
-  .controller('OperationResponseOBJEINMECtrl', ['$rootScope', '$scope', '$log', '$http', '$cookies', '$uibModal', '$uibModalInstance', '$q', 'file', function ($rootScope, $scope, $log, $http, $cookies, $uibModal, $uibModalInstance, $q, file) {
+  .controller('OperationResponseAOBJEAGCLCtrl', ['$rootScope', '$scope', '$log', '$http', '$cookies', '$uibModal', '$uibModalInstance', '$q', 'file', function ($rootScope, $scope, $log, $http, $cookies, $uibModal, $uibModalInstance, $q, file) {
 
     $scope.file = file;
     $scope.responses = {};
@@ -20,49 +20,22 @@ angular.module('csAdministratorApp')
       $uibModalInstance.close();
     };
 
-    switch (file.metadata.fileType) {
-      case "15OBJEINME":
-      case "OBJEINME":
-        _getAndParseOBJEINME(file).then(
-          function (parsedFile){
-            $scope.objes = parsedFile.metadata.details.filter(function(obje){
-              return obje.motivo === "700" || obje.motivo === "800"
-            });
-            $scope.objes.forEach(function(obje){
-              $scope.responses[obje.cups] = {};
-              $scope.responses[obje.cups].aceptado = null;
-              $scope.responses[obje.cups].segundoComer = '9999';
-              $scope.responses[obje.cups].comentarioRespuesta = null;
-            });
-          },
-          function (error){
-            $log.error(JSON.stringify(error));
-          }
-        )
-        break;
-      case "15AOBJEAGCL":
-      case "AOBJEAGCL":
-        _getAndParseAOBJEAGCL(file).then(
-          function (parsedFile){
-            $scope.objes = parsedFile.metadata.details.filter(function(obje){
-              return obje.motivo === "700" || obje.motivo === "800"
-            });
-            $scope.objes.forEach(function(obje){
-              $scope.responses[obje.agregacion] = {};
-              $scope.responses[obje.agregacion].aceptado = null;
-              $scope.responses[obje.agregacion].segundoComer = '9999';
-              $scope.responses[obje.agregacion].comentarioRespuesta = null;
-            });
-          },
-          function (error){
-            $log.error(JSON.stringify(error));
-          }
-        )
-        break;
-    }
-
-
-
+    _getAndParseAOBJEAGCL(file).then(
+      function (parsedFile){
+        $scope.objes = parsedFile.metadata.details.filter(function(obje){
+          return obje.motivo === "700" || obje.motivo === "800"
+        });
+        $scope.objes.forEach(function(obje){
+          $scope.responses[obje.agregacion] = {};
+          $scope.responses[obje.agregacion].aceptado = null;
+          $scope.responses[obje.agregacion].segundoComer = '9999';
+          $scope.responses[obje.agregacion].comentarioRespuesta = null;
+        });
+      },
+      function (error){
+        $log.error(JSON.stringify(error));
+      }
+    );
 
 
 
@@ -70,7 +43,7 @@ angular.module('csAdministratorApp')
       delete file.link;
 
       var fileMetadataWithResponses = $scope.objes.map(function(obje){
-        var response = $scope.responses[obje.cups];
+        var response = $scope.responses[obje.agregacion];
         Object.assign(obje, response); // Mergeamos las propiedades de ambos
         return obje;
       });
@@ -99,38 +72,6 @@ angular.module('csAdministratorApp')
     };
 
 
-    function _getAndParseOBJEINME(file){
-      var deferred = $q.defer();
-      if(file.metadata.hasOwnProperty('details')) {
-        deferred.resolve(file);
-      }
-      else {
-        $http.get(file.link).then(
-          function (response) {
-            file.metadata.details = [];
-            var file_lines = response.data.trim().split('\n');
-            file_lines.forEach(function(line){
-              var fields = line.trim().split(';');
-              var obje_detail = {};
-              obje_detail.cups = fields[0];
-              obje_detail.fechaInicio = fields[1];
-              obje_detail.fechaFin = fields[2];
-              obje_detail.motivo = fields[3];
-              obje_detail.publicado = parseInt(fields[4]);
-              obje_detail.propuesto = parseInt(fields[5]);
-              obje_detail.comentario = fields[6];
-              obje_detail.objeAAutoObje = fields[7];
-              file.metadata.details.push(obje_detail);
-            });
-            _updateInputFile(angular.copy(file));
-            deferred.resolve(file);
-          }, function (err) {
-            $log.error(JSON.stringify(err));
-          });
-      }
-      return deferred.promise;
-    }
-
     function _getAndParseAOBJEAGCL(file){
       var deferred = $q.defer();
       if(file.metadata.hasOwnProperty('details')) {
@@ -149,8 +90,8 @@ angular.module('csAdministratorApp')
               AOBJEAGCL_detail.fechaInicio = fields[8];
               AOBJEAGCL_detail.fechaFin = fields[9];
               AOBJEAGCL_detail.motivo = fields[10];
-              AOBJEAGCL_detail.publicado = parseInt(fields[11]);
-              AOBJEAGCL_detail.propuesto = parseInt(fields[12]);
+              AOBJEAGCL_detail.publicado = fields[11];
+              AOBJEAGCL_detail.propuesto = fields[12];
               AOBJEAGCL_detail.comentario = fields[13];
               AOBJEAGCL_detail.objeAAutoObje = fields[14];
               file.metadata.details.push(AOBJEAGCL_detail);
@@ -179,24 +120,27 @@ angular.module('csAdministratorApp')
           var filename_fields = filename.split('_');
           var responseData = {};
           var responseObjesData = objesMetadata.map(function(obje){
-            var objeDocument = response.data.filter(function(doc) {return doc.cups === obje.cups})[0];
+            var objeDocument = response.data.filter(function(doc) {
+              var doc_agregacion = [doc.codDistribuidor, doc.codComercializador, doc.codNivelTension, doc.codTarifa, doc.codDH, doc.codTipoPunto, doc.codProvincia].join(';');
+              return doc_agregacion === obje.agregacion}
+            )[0];
             return [
               objeDocument._id,
               objeDocument.codDistribuidor,
               objeDocument.codTipoPunto,
               objeDocument.codComercializador,
-              objeDocument.cups,
               null,
-              null,
-              null,
-              null,
+              objeDocument.codProvincia,
+              objeDocument.codTarifa,
+              objeDocument.codDH,
+              objeDocument.codNivelTension,
               obje.fechaInicio,
               obje.fechaFin,
               obje.publicado,
               obje.propuesto,
               obje.motivo,
               obje.comentario,
-              null,
+              objeDocument.objecionID_REE,
               objeDocument.acuseRecibo,
               obje.aceptado,
               obje.comentarioRespuesta,
@@ -205,16 +149,21 @@ angular.module('csAdministratorApp')
           });
           var generateFiles = {};
           responseObjesData.forEach(function(obje){
-            var segundoComer = objesMetadata.filter(function(objeMeta){return obje.split(';')[4] === objeMeta.cups})[0].segundoComer;
+            var obje_fields = obje.split(';')
+            var agregacion = [obje_fields[1], obje_fields[3], obje_fields[8], obje_fields[6], obje_fields[7], obje_fields[2], obje_fields[5]].join(';');
+            var primerComer = obje_fields[3];
+            var segundoComer = objesMetadata.filter(function(objeMeta){
+              return agregacion === objeMeta.agregacion
+            })[0].segundoComer;
             var responseFilename = [
                 'REINTEROBJEDISTRIB',
                 filename_fields[0],
+                primerComer,
                 filename_fields[1],
-                filename_fields[2],
                 segundoComer,
-                filename_fields[3],
+                filename_fields[2],
                 new Date().getFullYear().toString()+((new Date().getMonth()+1<10)?'0'+(new Date().getMonth()+1).toString():(new Date().getMonth()+1).toString())+new Date().getDate().toString()
-            ].join('_')+'.100';
+            ].join('_');
             if(generateFiles.hasOwnProperty(responseFilename)) {
               generateFiles[responseFilename].data.push(obje);
             }
@@ -228,10 +177,39 @@ angular.module('csAdministratorApp')
           for (var file in generateFiles){
             result.push(generateFiles[file])
           }
-          deferred.resolve(result);
+          $q.all(result.map(function(file){ return getLastFilename(file.filename)})).then(
+            function(filenames){
+              result = result.map(function(file){
+                var lastVersion = parseInt(filenames.filter(function(filename) { return filename.split('.')[0] === file.filename })[0].split('.')[1]);
+                file.filename = file.filename + '.' + (lastVersion+1).toString();
+                return file;
+              });
+              deferred.resolve(result);
+            },
+            function(err){
+              $log.error(JSON.stringify(err));
+            }
+          )
         }, function (err) {
           $log.error(JSON.stringify(err));
         });
+      return deferred.promise;
+    }
+
+
+    function getLastFilename(filename) {
+      var deferred = $q.defer();
+      $http.get('http://' + $rootScope.serverConfig.host + ':' + $rootScope.serverConfig.port + '/api/query/last-file-by-input-filename/'+ $rootScope.distrib.alias + '/' + filename).then(
+        function(response){
+          if (response.data.length > 0)
+            deferred.resolve(response.data[0].filename);
+          else
+            deferred.resolve(filename+'.100');
+        }, function (err) {
+          $log.error(JSON.stringify(err));
+          deferred.reject(err);
+        }
+      );
       return deferred.promise;
     }
 

@@ -57,14 +57,31 @@ angular.module('csAdministratorApp')
 
       $ctrl.openModal = function (file) {
 
-        var modalInstance = $uibModal.open({
-          templateUrl: 'components/operationResponseObje/view_modal.html',
-          controller: 'OperationResponseObjeModalCtrl',
-          size: 'lg',
-          resolve: {
-            file: file
-          }
-        });
+        var modalInstance;
+        switch (file.metadata.fileType) {
+          case "15OBJEINME":
+          case "OBJEINME":
+            modalInstance = $uibModal.open({
+              templateUrl: 'components/operationResponseObje/view_response_objeinme.html',
+              controller: 'OperationResponseOBJEINMECtrl',
+              size: 'md',
+              resolve: {
+                file: file
+              }
+            });
+            break;
+          case "15AOBJEAGCL":
+          case "AOBJEAGCL":
+            modalInstance = $uibModal.open({
+              templateUrl: 'components/operationResponseObje/view_response_aobjeagcl.html',
+              controller: 'OperationResponseAOBJEAGCLCtrl',
+              size: 'md',
+              resolve: {
+                file: file
+              }
+            });
+            break;
+        }
 
         modalInstance.result.then(function(result){
           if(result) {

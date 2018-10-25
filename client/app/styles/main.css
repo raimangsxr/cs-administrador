@@ -153,3 +153,11 @@ body {
   position: fixed;
   top: 1em;
 }
+
+@media (min-width: 1400px){
+
+  .modal-md {
+    width: 800px;
+  }
+
+}
