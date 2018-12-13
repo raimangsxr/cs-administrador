@@ -67,7 +67,15 @@
       </div>
     </div>
     <div class="modal-footer">
-      <button type="submit" class="btn btn-danger" ng-disabled="responseForm.$invalid || accept === null">Responder</button>
+      <button type="submit" class="btn btn-danger"
+              ng-disabled="responseForm.$invalid || accept === null || objes.length === 0">
+        Responder
+      </button>
+      <button type="button" class="btn btn-warning"
+              ng-click="noManualPendingResponses()"
+              ng-disabled="objes.length > 0">
+        Sin respuestas pendientes
+      </button>
       <button type="button" class="btn btn-primary" ng-click="close()">Cerrar</button>
     </div>
   </form>

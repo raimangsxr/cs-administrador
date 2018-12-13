@@ -20,10 +20,17 @@ angular.module('csAdministratorApp')
       $uibModalInstance.close();
     };
 
+    $scope.noManualPendingResponses = function() {
+      $scope.file.metadata.fechaRevisionManual = new Date().toISOString();
+      $scope.file.metadata.noManualPendingResponses = true;
+      _updateInputFile($scope.file);
+      $uibModalInstance.close(true);
+    };
+
     _getAndParseAOBJEAGCL(file).then(
       function (parsedFile){
         $scope.objes = parsedFile.metadata.details.filter(function(obje){
-          return obje.motivo === "700" || obje.motivo === "800"
+          return obje.necesitaRevisionManual;
         });
         $scope.objes.forEach(function(obje){
           $scope.responses[obje.agregacion] = {};
@@ -78,26 +85,43 @@ angular.module('csAdministratorApp')
         deferred.resolve(file);
       }
       else {
+        var file_map = [];
         $http.get(file.link).then(
-          function (response) {
-            file.metadata.details = [];
-            var file_lines = response.data.trim().split('\n');
-            file_lines.forEach(function(line){
+          function (fileResponse) {
+            var file_lines = fileResponse.data.trim().split('\n');
+            file_map = file_lines.map(function(line){
               var fields = line.trim().split(';');
-              var AOBJEAGCL_detail = {};
-              AOBJEAGCL_detail.id_objecion = fields[0];
-              AOBJEAGCL_detail.agregacion = fields[1]+';'+fields[2]+';'+fields[3]+';'+fields[4]+';'+fields[5]+';'+fields[6]+';'+fields[7];
-              AOBJEAGCL_detail.fechaInicio = fields[8];
-              AOBJEAGCL_detail.fechaFin = fields[9];
-              AOBJEAGCL_detail.motivo = fields[10];
-              AOBJEAGCL_detail.publicado = fields[11];
-              AOBJEAGCL_detail.propuesto = fields[12];
-              AOBJEAGCL_detail.comentario = fields[13];
-              AOBJEAGCL_detail.objeAAutoObje = fields[14];
-              file.metadata.details.push(AOBJEAGCL_detail);
+              var result = {}
+              result.id_objecion = fields[0];
+              result.fechaInicio = fields[8];
+              result.fechaFin = fields[9];
+              return result;
             });
-            _updateInputFile(angular.copy(file));
-            deferred.resolve(file);
+            $http.get('http://' + $rootScope.serverConfig.host + ':' + $rootScope.serverConfig.port + '/api/query/objecion-intercambio-distribuidor/'+ $rootScope.distrib.alias + '/' + file._id).then(
+              function (response) {
+                file.metadata.details = [];
+                response.data.forEach(function(obje){
+                  var file_line = file_map.filter(function(obj) { return obj.id_objecion === obje.objecionID_REE})[0];
+                  var aggFields = obje.aggregationId.substring(0, 22).split('_');
+                  var aggregationId = [aggFields[0], aggFields[2], aggFields[3], aggFields[4], aggFields[5], aggFields[6], aggFields[1]].join(';');
+                  var AOBJEAGCL_detail = {};
+                  AOBJEAGCL_detail.id_objecion = obje.objecionID_REE;
+                  AOBJEAGCL_detail.agregacion = aggregationId;
+                  AOBJEAGCL_detail.fechaInicio = file_line.fechaInicio;
+                  AOBJEAGCL_detail.fechaFin = file_line.fechaFin;
+                  AOBJEAGCL_detail.motivo = obje.motivo;
+                  AOBJEAGCL_detail.publicado = obje.aePublicado;
+                  AOBJEAGCL_detail.propuesto = obje.aePropuesto;
+                  AOBJEAGCL_detail.comentario = obje.comentarioEmisorObjecion;
+                  AOBJEAGCL_detail.objeAAutoObje = obje.autoObjecion;
+                  AOBJEAGCL_detail.necesitaRevisionManual = (obje.idObjecionesDesagregadas.length === 0 && obje.aceptacion === '' ) ? true : false;
+                  file.metadata.details.push(AOBJEAGCL_detail);
+                });
+                _updateInputFile(angular.copy(file));
+                deferred.resolve(file);
+              }, function (err) {
+                $log.error(JSON.stringify(err));
+              });
           }, function (err) {
             $log.error(JSON.stringify(err));
           });
@@ -175,7 +199,7 @@ angular.module('csAdministratorApp')
           });
           var result = [];
           for (var file in generateFiles){
-            result.push(generateFiles[file])
+            result.push(generateFiles[file]);
           }
           $q.all(result.map(function(file){ return getLastFilename(file.filename)})).then(
             function(filenames){
