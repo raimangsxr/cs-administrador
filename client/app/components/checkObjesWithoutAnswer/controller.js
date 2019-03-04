@@ -114,6 +114,9 @@ angular.module('csAdministratorApp')
             case 'AOBJEAGCL':
               obje.objeObject = obje.aggregationId;
               break;
+            case 'AREVAC':
+              obje.objeObject = (obje.codTipoPunto === '2') ? obje.cups : obje.aggregationId;
+              break;
             default:
               obje.objeObject = 'DESCONOCIDO!';
           }
