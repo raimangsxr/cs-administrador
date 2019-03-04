@@ -105,6 +105,91 @@ router.get('/aggswomeasures/:distrib/:year/:month', function(req, res, next) {
 
 
 
+/* GET objes without answer by the requested period and distrib */
+router.get('/objeswoanswer/:distrib/:year/:month', function(req, res, next) {
+    try{
+        var db = mongoskin.db('mongodb://'+config.dbUser+':'+config.dbPass+'@'+config.dbIp+':'+config.dbPort+'/'
+          +req.params.distrib+'-database?authSource='+req.params.distrib+'-database', {safe:true});
+        var year = parseInt(req.params.year);
+        var month = parseInt(req.params.month);
+        var reference_period = new Date(year, month-1, 1, 0);
+        var start_period = reference_period.toISOString();
+        reference_period.setMonth(reference_period.getMonth()+1);
+        var end_period = reference_period.toISOString();
+        db.collection('objecionIntercambioDistribuidor')
+          .find({
+            "fechaInicioObjecion": {$gte: new Date(start_period)},
+            "fechaFinObjecion": {$lte: new Date(end_period)},
+            "aceptacion": "",
+            $or: [
+              {"objectionOmitted": false},
+              {"objectionOmitted": {$exists: false}}
+            ]
+          })
+          .toArray(function(e, results) {
+              if (e) return next(e);
+              db.close();
+              res.send(results);
+          });
+    } catch (error){
+        console.error(error);
+        res.status(500).send(error);
+    }
+});
+
+/* POST input file to set to necesitaRevisionManual */
+router.post('/objeswoanswer/necesitarevisionmanual/:distrib/:id', function(req, res, next) {
+  try {
+    var forcedBy = req.body.forcedBy;
+    var db = mongoskin.db('mongodb://'+config.dbUser+':'+config.dbPass+'@'+config.dbIp+':'+config.dbPort+'/'
+      +req.params.distrib+'-database?authSource='+req.params.distrib+'-database', {safe:true});
+    db.collection('inputFs.files').update(
+      {_id: id(req.params.id)},
+      {
+        $set: {
+          "metadata.necesitaRevisionManual": true,
+          "metadata.necesitaRevisionManualForcedBy": forcedBy,
+          "metadata.necesitaRevisionManualForcedDate": new Date()
+        },
+        $unset: {"metadata.details": 1}
+      }, function (error) {
+      if (error) return next(error);
+      db.close();
+      res.status(200).json({"result": "ok"});
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send(error);
+  }
+});
+
+/* POST input file to set to objectionOmitted */
+router.post('/objeswoanswer/objectionomitted/:distrib/:id', function(req, res, next) {
+  try {
+    var forcedBy = req.body.forcedBy;
+    var db = mongoskin.db('mongodb://'+config.dbUser+':'+config.dbPass+'@'+config.dbIp+':'+config.dbPort+'/'
+      +req.params.distrib+'-database?authSource='+req.params.distrib+'-database', {safe:true});
+    db.collection('objecionIntercambioDistribuidor').update(
+      {_id: id(req.params.id)},
+      {
+        $set: {
+          "objectionOmitted": true,
+          "objectionOmittedForcedBy": forcedBy,
+          "objectionOmittedForcedDate": new Date()
+        }
+      }, function (error) {
+        if (error) return next(error);
+        db.close();
+        res.status(200).json({"result": "ok"});
+      });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send(error);
+  }
+});
+
+
+
 
 // AUX Methods
 

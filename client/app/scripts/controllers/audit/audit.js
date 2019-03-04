@@ -37,7 +37,7 @@ angular.module('csAdministratorApp')
     // Can review files
     $scope.canReviewFilesByInputState = ['PROCESADO_ERROR', 'PROCESADO_INCORRECTO_PDTE_INFORME'];
     $scope.canReviewFilesByOutputState = ['REE_CONFIRMADO_BAD', 'REE_CONFIRMADO_BAD2', 'REE_DESPUBLICADO_BAD', 'REE_CONFIRMADO_TIMEOUT_BAD', 'REE_CONFIRMADO_TIMEOUT_BAD2'];
-    $scope.canReviewFilesByType = ['BALD','CUPS34','CUPS5'];
+    $scope.canReviewFilesByType = ['BALD','CUPS','CUPS34','CUPS5'];
 
     // Can omit FileTypes
     $scope.omitTypes = {

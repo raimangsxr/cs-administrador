@@ -1,0 +1,68 @@
+<div class="panel panel-default">
+  <div class="panel-heading"><h3 class="panel-title">Introduce fecha de comprobación</h3></div>
+  <div class="panel-body">
+    <div class="col-md-1">
+      <label>Año</label>
+      <select class="form-control" ng-model="$ctrl.selected_year" ng-options="month for month in $ctrl.years" ng-change="$ctrl.changePeriod()"></select>
+    </div>
+    <div class="col-md-1">
+      <label>Mes</label>
+      <select class="form-control" ng-model="$ctrl.selected_month" ng-options="month for month in $ctrl.months" ng-change="$ctrl.changePeriod()"></select>
+    </div>
+    <div class="col-md-2">
+      <label>Período seleccionado</label>
+      <div>{{$ctrl.period}}</div>
+    </div>
+  </div>
+</div>
+
+<div class="row" ng-show="!$ctrl.loading && !$ctrl.error">
+  <div class="col-md-12">
+    <div class="panel panel-primary">
+      <div class="panel-heading"><h3 class="panel-title">Objeciones sin respuesta en el período {{$ctrl.period}}</h3></div>
+      <div class="panel-body">
+        <table ng-table="$ctrl.tableParams" class="table" show-filter="true">
+          <tr ng-class="{'green': obje.checked}" class="animate" ng-repeat="obje in $data">
+            <td style="vertical-align: middle;" title="'Tipo'" filter="{'tipoObjecion': 'text'}" sortable="'tipoObjecion'">
+              {{obje.tipoObjecion}}
+            </td>
+            <td style="vertical-align: middle;" title="'CUPS/Agregación'" filter="{'objeObject': 'text'}" sortable="'objeObject'">
+              <div style="width:220px;">
+                {{obje.objeObject}}
+              </div>
+            </td>
+            <td style="vertical-align: middle;" title="'Cod.Tipo'" filter="{'codTipoPunto': 'number'}" sortable="'codTipoPunto'">
+              {{obje.codTipoPunto}} {{obje.checked}}
+            </td>
+            <td style="vertical-align: middle;" title="'Motivo'" filter="{'motivo': 'text'}" sortable="'motivo'">
+              {{obje.motivo}}
+            </td>
+            <td style="vertical-align: middle;" title="'Publicado'" filter="{'aePublicado': 'number'}" sortable="'aePublicado'">
+              {{obje.aePublicado}}
+            </td>
+            <td style="vertical-align: middle;" title="'Propuesto'" filter="{'aePropuesto': 'number'}" sortable="'aePropuesto'">
+              {{obje.aePropuesto}}
+            </td>
+            <td style="vertical-align: middle;" title="'Fichero de entrada'" filter="{'inputFileName': 'text'}" sortable="'inputFileName'">
+              {{obje.inputFileName}}
+            </td>
+            <td title="'Operaciones'">
+              <button class="btn btn-block btn-primary" ng-disabled="obje.checked" ng-click="$ctrl.markAsNecesitaRevisionManual(obje)">Necesita revisión manual</button>
+              <button class="btn btn-block btn-warning" ng-disabled="obje.checked" ng-click="$ctrl.markAsObjectionOmitted(obje)">Omitir</button>
+            </td>
+          </tr>
+        </table>
+        <div class="alert alert-success animate" ng-show="$ctrl.objes.length === 0">No existen objeciones o todas están contestadas en este período</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div ng-show="$ctrl.loading" class="col-md-12 vert-offset-top-6 vert-offset-bottom-2 text-center">
+  <img src="images/loader.gif" />
+  <p><strong>Procesando objeciones..</strong></p>
+</div>
+
+<div ng-show="!$ctrl.loading && $ctrl.error" class="col-md-12 vert-offset-top-6 vert-offset-bottom-2 text-center">
+  <div class="col-md-offset-3 col-md-6 alert alert-danger" role="alert">Se han producido errores en la carga de datos de BD</div>
+</div>

@@ -63,6 +63,24 @@ router.get('/:distrib/:collection', function(req, res, next) {
 });
 
 
+
+/* GET document by collection and id. */
+router.get('/:distrib/:collection/id/:id', function(req, res, next) {
+  try {
+    var db = mongoskin.db('mongodb://' + config.dbUser + ':' + config.dbPass + '@' + config.dbIp + ':' + config.dbPort + '/'
+      + req.params.distrib + '-database?authSource=' + req.params.distrib + '-database', {safe: true});
+    db.collection(req.params.collection).find({_id:id(req.params.id)}, {}).toArray(function (e, results) {
+      if (e) return next(e);
+      db.close();
+      res.send( (results.length === 0) ? {} : results[0] );
+    });
+  } catch (error){
+    console.error(error);
+    res.status(500).send(error);
+  }
+});
+
+
 /* GET collection with uploadDate in period. */
 router.get('/:distrib/:collection/:period', function(req, res, next) {
     try {

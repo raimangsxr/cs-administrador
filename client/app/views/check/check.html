@@ -14,14 +14,16 @@
     <div class="btn-group col-md-8">
       <button class="btn btn-default" ng-click="check_selected = 1">Agregaciones de alta sin medida</button>
       <button class="btn btn-default" ng-click="check_selected = 2">Medidas por agregación</button>
+      <button class="btn btn-default" ng-click="check_selected = 3">Objeciones sin respuesta</button>
     </div>
   </div>
 
 
   <div class="col-md-12 vert-offset-top-2 vert-offset-bottom-6">
     <div class="col-md-12 animate">
-      <check-ags-without-measure ng-show="check_selected == 1" distrib="distrib"></check-ags-without-measure>
-      <check-ags-measure ng-show="check_selected == 2" distrib="distrib"></check-ags-measure>
+      <check-ags-without-measure ng-if="check_selected == 1" distrib="distrib"></check-ags-without-measure>
+      <check-ags-measure ng-if="check_selected == 2" distrib="distrib"></check-ags-measure>
+      <check-objes-without-answer ng-if="check_selected == 3" distrib="distrib"></check-objes-without-answer>
 
     </div>
   </div>

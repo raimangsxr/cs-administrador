@@ -12,7 +12,6 @@ angular.module('csAdministratorApp')
 
 
     $rootScope.serverConfig = {host: '192.168.246.52', port: 9000};
-
     //$rootScope.serverConfig = {host: '192.168.234.12', port: 3000};
 
 
