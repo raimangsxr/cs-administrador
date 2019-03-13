@@ -36,23 +36,6 @@ angular.module('csAdministratorApp')
         $ctrl.period = $ctrl.selected_year + '-' + $ctrl.selected_month;
         if(!$ctrl.distrib.alias)
           return;
-        $ctrl.loading = true;
-        $ctrl.error = false;
-        $http.get('http://'+$rootScope.serverConfig.host+':'+$rootScope.serverConfig.port+'/api/check/objeswoanswer/'+$ctrl.distrib.alias+'/'+$ctrl.selected_year+'/'+$ctrl.selected_month).then(
-          function(response){
-            $ctrl.objes = processObjes(response.data);
-            $ctrl.tableParams = new NgTableParams({
-              page: 1,
-              count: 50,
-              sorting: { tipoObjecion: "asc", codTipoPunto: "asc", objeObject: "asc" },
-            }, {data: $ctrl.objes});
-            $ctrl.loading = false;
-          }, function(err){
-            $ctrl.loading = false;
-            $ctrl.error = true;
-            $log.error(JSON.stringify(err));
-          }
-        );
       };
 
 
@@ -94,6 +77,27 @@ angular.module('csAdministratorApp')
           }
         );
       };
+
+
+      $ctrl.query = function() {
+        $ctrl.loading = true;
+        $ctrl.error = false;
+        $http.get('http://'+$rootScope.serverConfig.host+':'+$rootScope.serverConfig.port+'/api/check/objeswoanswer/'+$ctrl.distrib.alias+'/'+$ctrl.selected_year+'/'+$ctrl.selected_month).then(
+          function(response){
+            $ctrl.objes = processObjes(response.data);
+            $ctrl.tableParams = new NgTableParams({
+              page: 1,
+              count: 50,
+              sorting: { tipoObjecion: "asc", codTipoPunto: "asc", objeObject: "asc" },
+            }, {data: $ctrl.objes});
+            $ctrl.loading = false;
+          }, function(err) {
+            $ctrl.loading = false;
+            $ctrl.error = true;
+            $log.error(JSON.stringify(err));
+          }
+        );
+      }
 
 
 

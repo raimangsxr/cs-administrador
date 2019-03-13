@@ -9,9 +9,9 @@
       <label>Mes</label>
       <select class="form-control" ng-model="$ctrl.selected_month" ng-options="month for month in $ctrl.months" ng-change="$ctrl.changePeriod()"></select>
     </div>
-    <div class="col-md-2">
-      <label>Período seleccionado</label>
-      <div>{{$ctrl.period}}</div>
+    <div class="col-md-1">
+      <label>Operaciones</label>
+      <button class="btn btn-block btn-primary" ng-click="$ctrl.query()">Buscar</button>
     </div>
   </div>
 </div>

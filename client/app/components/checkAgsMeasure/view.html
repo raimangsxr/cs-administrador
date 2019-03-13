@@ -9,9 +9,9 @@
       <label>Mes</label>
       <select class="form-control" ng-model="$ctrl.selected_month" ng-options="month for month in $ctrl.months" ng-change="$ctrl.changePeriod()"></select>
     </div>
-    <div class="col-md-2">
-      <label>Período seleccionado</label>
-      <div>{{$ctrl.period}}</div>
+    <div class="col-md-1">
+      <label>Operaciones</label>
+      <button class="btn btn-block btn-primary" ng-click="$ctrl.query()">Buscar</button>
     </div>
   </div>
 </div>
@@ -19,22 +19,22 @@
 <div class="row" ng-show="!$ctrl.loading && !$ctrl.error">
   <div class="col-md-offset-3 col-md-6">
     <div class="panel panel-primary">
-      <div class="panel-heading"><h3 class="panel-title">Medidas por agregación en el período {{$ctrl.period}} ({{$ctrl.aggregations.length}} aggregaciones, {{$ctrl.total|number}} kWh enviados)</h3></div>
+      <div class="panel-heading"><h3 class="panel-title">Medidas por agregación/cups en el período {{$ctrl.period}} ({{$ctrl.content.length}} aggregaciones/cups, {{$ctrl.total|number}} kWh enviados)</h3></div>
       <div class="panel-body">
         <table ng-table="$ctrl.tableParams" class="table" show-filter="true">
-          <tr class="animate" ng-repeat="agg in $data">
-            <td style="vertical-align: middle;" title="'Agregacion'" filter="{'aggregationId': 'text'}" sortable="'aggregationId'">
-              {{agg.aggregationId}}
+          <tr class="animate" ng-repeat="content in $data">
+            <td style="vertical-align: middle;" title="'Agregacion/CUPS'" filter="{'reference': 'text'}" sortable="'reference'">
+              {{content.reference}}
             </td>
             <td style="vertical-align: middle;" title="'Total'" filter="{'total': 'number'}" sortable="'total'">
-              {{agg.total | number}}
+              {{content.total | number}}
             </td>
             <td style="vertical-align: middle;" title="'Ultimo envío'" filter="{'date': 'text'}" sortable="'date'">
-              {{agg.date}}
+              {{content.date}}
             </td>
           </tr>
         </table>
-        <div class="alert alert-danger animate" ng-show="$ctrl.aggregations.length === 0">Ninguna agregación tiene medidas en este período</div>
+        <div class="alert alert-danger animate" ng-show="$ctrl.content.length === 0">Ninguna agregación/cups tiene medidas en este período</div>
       </div>
     </div>
   </div>

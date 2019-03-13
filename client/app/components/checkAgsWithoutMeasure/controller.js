@@ -36,6 +36,9 @@ angular.module('csAdministratorApp')
         $ctrl.period = $ctrl.selected_year + '-' + $ctrl.selected_month;
         if(!$ctrl.distrib.alias)
           return;
+      }
+
+      $ctrl.query = function() {
         $ctrl.loading = true;
         $ctrl.error = false;
         $http.get('http://'+$rootScope.serverConfig.host+':'+$rootScope.serverConfig.port+'/api/check/aggswomeasures/'+$ctrl.distrib.alias+'/'+$ctrl.selected_year+'/'+$ctrl.selected_month).then(

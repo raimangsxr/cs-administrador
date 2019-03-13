@@ -38,6 +38,79 @@ router.get('/aggstotals/:distrib/:year/:month', function(req, res, next) {
     }
 });
 
+router.get('/cupsmeasures/:distrib/:year/:month', function(req, res, next) {
+  try{
+    var db = mongoskin.db('mongodb://'+config.dbUser+':'+config.dbPass+'@'+config.dbIp+':'+config.dbPort+'/'
+      +req.params.distrib+'-database?authSource='+req.params.distrib+'-database', {safe:true});
+    var year = parseInt(req.params.year);
+    var month = parseInt(req.params.month);
+    var objectiveMonth = new Date(year, month - 1);
+    var objectiveNextMonth = new Date(year, month);
+
+    db.collection('medidaPeriodoCups').aggregate([
+      {
+        $match: {
+          codTipoPunto: "2",
+          origen: 1,
+          fechaInicio: {
+            $gte: objectiveMonth,
+            $lt: objectiveNextMonth
+          }
+        }
+      },
+      { $unwind: "$measures" },
+      {
+        $project: {
+          cupsId: 1,
+          gridFileId: 1,
+          total: "$measures.actEntrante",
+          hora: "$measures.anoMesDiaHora"
+        }
+      },
+      {
+        $sort: {
+          cupsId: 1,
+          hora: 1,
+          gridFileId: 1
+        }
+      }
+    ], function(e, results){
+      if (e) return next(e);
+      db.close();
+
+      var distinctCups = new Set();
+      results.forEach(function(mpc) {
+        distinctCups.add(mpc.cupsId);
+      });
+      distinctCups = Array.from(distinctCups);
+
+      var mpcByCupsAndPeriod = {};
+      results.forEach(function(mpc){
+        mpc.date = new Date( parseInt( mpc.gridFileId.substring(0,8), 16 ) * 1000 ).getTime();
+        var hora = Number(String(mpc.hora).substring(6));
+        if(!mpcByCupsAndPeriod.hasOwnProperty(mpc.cupsId)) {
+          mpcByCupsAndPeriod[mpc.cupsId] = [];
+        }
+        mpcByCupsAndPeriod[mpc.cupsId][hora] = mpc;
+      });
+      distinctCups.forEach(function(cups){
+        mpcByCupsAndPeriod[cups] = mpcByCupsAndPeriod[cups].filter(function(mpc){return mpc !== undefined});
+      });
+      var result = distinctCups.map(function(cups){
+        var out = {};
+        out.cups = cups;
+        out.date = Math.max(...mpcByCupsAndPeriod[cups].map(function(mpc){return mpc.date}));
+        out.total = mpcByCupsAndPeriod[cups].map(function(mpc){return mpc.total}).reduce(function(a,b){return a+b});
+        return out;
+      });
+      res.send(result);
+    });
+  } catch (error){
+    console.error(error);
+    res.status(500).send(error);
+  }
+});
+
 
 /* GET only active aggregations with total = 0 or without measures sent by the requested period and distrib */
 router.get('/aggswomeasures/:distrib/:year/:month', function(req, res, next) {

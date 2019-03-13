@@ -9,7 +9,7 @@ angular.module('csAdministratorApp')
     bindings: {
       distrib: '=',
     },
-    controller: function Controller ($rootScope, $scope, $http, $log, NgTableParams) {
+    controller: function Controller ($rootScope, $scope, $http, $log, $q, NgTableParams) {
       var $ctrl = this;
 
 
@@ -36,24 +36,70 @@ angular.module('csAdministratorApp')
         $ctrl.period = $ctrl.selected_year + '-' + $ctrl.selected_month;
         if(!$ctrl.distrib.alias)
           return;
+      }
+
+
+      $ctrl.query = function(){
         $ctrl.loading = true;
         $ctrl.error = false;
-        $http.get('http://'+$rootScope.serverConfig.host+':'+$rootScope.serverConfig.port+'/api/check/aggstotals/'+$ctrl.distrib.alias+'/'+$ctrl.selected_year+'/'+$ctrl.selected_month).then(
-          function(response){
-            $ctrl.aggregations = response.data;
-            $ctrl.total = (response.data.length === 0) ? 0 : $ctrl.aggregations.map(function(agg){return agg.total}).reduce(function(sum, measure){return sum+measure});
+        $q.all([getAggsMeasures(), getCupsMeasures()]).then(
+          function(responsesData) {
+            var aggregations = responsesData[0];
+            var cups = responsesData[1];
+            var content = aggregations.concat(cups);
+            $ctrl.total = (aggregations.length === 0) ? 0 : aggregations.map(function(agg){return agg.total}).reduce(function(sum, measure){return sum+measure});
+            $ctrl.total += (cups.length === 0) ? 0 : cups.map(function(c){return c.total}).reduce(function(sum, measure){return sum+measure});
+            $ctrl.content = content.map(function(c){
+              if(c.hasOwnProperty('cups')) {
+                c.reference = c.cups;
+                c.date = new Date(c.date).toISOString();
+              }
+              if(c.hasOwnProperty('aggregationId')) {
+                c.reference = c.aggregationId;
+              }
+              return c;
+            });
             $ctrl.tableParams = new NgTableParams({
               page: 1,
               count: 50,
-              sorting: { agregationId: "asc" },
-            }, {data: response.data});
+              sorting: { reference: "asc" },
+            }, {data: $ctrl.content});
             $ctrl.loading = false;
-          }, function(err){
+          },
+          function(err) {
             $ctrl.loading = false;
             $ctrl.error = true;
             $log.error(JSON.stringify(err));
           }
         );
+      }
+
+
+      function getAggsMeasures() {
+        var deferred = $q.defer();
+        $http.get('http://'+$rootScope.serverConfig.host+':'+$rootScope.serverConfig.port+'/api/check/aggstotals/'+$ctrl.distrib.alias+'/'+$ctrl.selected_year+'/'+$ctrl.selected_month).then(
+          function(response){
+            deferred.resolve(response.data);
+          }, function(err){
+            $log.error('Error getting Aggs measures!');
+            deferred.reject(err);
+          }
+        );
+        return deferred.promise;
+      }
+
+
+      function getCupsMeasures() {
+        var deferred = $q.defer();
+        $http.get('http://'+$rootScope.serverConfig.host+':'+$rootScope.serverConfig.port+'/api/check/cupsmeasures/'+$ctrl.distrib.alias+'/'+$ctrl.selected_year+'/'+$ctrl.selected_month).then(
+          function(response){
+            deferred.resolve(response.data);
+          }, function(err){
+            $log.error('Error getting Cups measures!');
+            deferred.reject(err);
+          }
+        );
+        return deferred.promise;
       }
     }
   });
