@@ -1,0 +1,55 @@
+<div class="panel panel-default">
+  <div class="panel-heading"><h3 class="panel-title">Introduce fecha de comprobación</h3></div>
+  <div class="panel-body">
+    <div class="col-md-1">
+      <label>Año</label>
+      <select class="form-control" ng-model="$ctrl.selected_year" ng-options="year for year in $ctrl.years" ng-change="$ctrl.changePeriod()"></select>
+    </div>
+    <div class="col-md-1">
+      <label>Mes</label>
+      <select class="form-control" ng-model="$ctrl.selected_month" ng-options="month for month in $ctrl.months" ng-change="$ctrl.changePeriod()"></select>
+    </div>
+    <div class="col-md-1">
+      <label>Día</label>
+      <select class="form-control" ng-model="$ctrl.selected_day" ng-options="day for day in $ctrl.days" ng-change="$ctrl.changePeriod()"></select>
+    </div>
+    <div class="col-md-2">
+      <label>Agregación</label>
+      <input class="form-control" ng-model="$ctrl.aggregation" type="text" />
+    </div>
+    <div class="col-md-1">
+      <label>Operaciones</label>
+      <button class="btn btn-block btn-primary" ng-click="$ctrl.query()">Buscar</button>
+    </div>
+  </div>
+</div>
+
+<div class="row" ng-show="!$ctrl.loading && !$ctrl.error">
+  <div class="col-md-offset-3 col-md-6">
+    <div class="panel panel-primary">
+      <div class="panel-heading"><h3 class="panel-title">La agregación '{{$ctrl.aggregation}}' contiene los siguientes CUPS ({{$ctrl.content.length}})</h3></div>
+      <div class="panel-body">
+        <table ng-table="$ctrl.tableParams" class="table" show-filter="true">
+          <tr class="animate" ng-repeat="content in $data">
+            <td style="vertical-align: middle;" title="'CUPS'" filter="{'cups': 'text'}" sortable="'cups'">
+              {{content.cups}}
+            </td>
+            <td style="vertical-align: middle;" title="'Fecha de entrada'" filter="{'entrada': 'text'}" sortable="'entrada'">
+              {{content.entrada}}
+            </td>
+          </tr>
+        </table>
+        <div class="alert alert-danger animate" ng-show="$ctrl.content.length === 0">No hay CUPS en la agregación para la fecha indicada</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div ng-show="$ctrl.loading" class="col-md-12 vert-offset-top-6 vert-offset-bottom-2 text-center">
+  <img src="images/loader.gif" />
+  <p><strong>Procesando ficheros..</strong></p>
+</div>
+
+<div ng-show="!$ctrl.loading && $ctrl.error" class="col-md-12 vert-offset-top-6 vert-offset-bottom-2 text-center">
+  <div class="col-md-offset-3 col-md-6 alert alert-danger" role="alert">Se han producido errores en la carga de datos de BD</div>
+</div>

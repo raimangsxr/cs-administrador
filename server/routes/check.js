@@ -38,6 +38,8 @@ router.get('/aggstotals/:distrib/:year/:month', function(req, res, next) {
     }
 });
 
+
+/* GET total of each CUPS T2 sent by the requested period and distrib */
 router.get('/cupsmeasures/:distrib/:year/:month', function(req, res, next) {
   try{
     var db = mongoskin.db('mongodb://'+config.dbUser+':'+config.dbPass+'@'+config.dbIp+':'+config.dbPort+'/'
@@ -209,6 +211,111 @@ router.get('/objeswoanswer/:distrib/:year/:month', function(req, res, next) {
         res.status(500).send(error);
     }
 });
+
+
+/* GET all objes by the requested year, month and distrib */
+router.get('/objes/:distrib/:year/:month', function(req, res, next) {
+  try{
+    var db = mongoskin.db('mongodb://'+config.dbUser+':'+config.dbPass+'@'+config.dbIp+':'+config.dbPort+'/'
+      +req.params.distrib+'-database?authSource='+req.params.distrib+'-database', {safe:true});
+    var year = parseInt(req.params.year);
+    var month = parseInt(req.params.month);
+    var reference_period = new Date(year, month-1, 1, 0);
+    var start_period = reference_period.toISOString();
+    reference_period.setMonth(reference_period.getMonth()+1);
+    var end_period = reference_period.toISOString();
+    db.collection('objecionIntercambioDistribuidor')
+      .find({
+        "fechaInicioObjecion": {$gte: new Date(start_period)},
+        "fechaFinObjecion": {$lte: new Date(end_period)}
+      })
+      .toArray(function(e, results) {
+        if (e) return next(e);
+        db.close();
+        res.send(results);
+      });
+  } catch (error){
+    console.error(error);
+    res.status(500).send(error);
+  }
+});
+
+
+/* GET consolidated inventary by the requested distrib and CUPS*/
+router.get('/inventory/:distrib/:cups', function(req, res, next) {
+  try{
+    var db = mongoskin.db('mongodb://'+config.dbUser+':'+config.dbPass+'@'+config.dbIp+':'+config.dbPort+'/'
+      +req.params.distrib+'-database?authSource='+req.params.distrib+'-database', {safe:true});
+    db.collection('inventario')
+      .find({
+        "cupsId": req.params.cups,
+        "estadoProcesamiento": "PROCESADO_OK"
+      })
+      .toArray(function(e, results) {
+        if (e) return next(e);
+        db.close();
+        res.send(results);
+      });
+  } catch (error){
+    console.error(error);
+    res.status(500).send(error);
+  }
+});
+
+
+/* GET cups by the requested distrib and Aggregation and day*/
+router.get('/agcl/:distrib/:year/:month/:day/:aggregationId', function(req, res, next) {
+  try{
+    var db = mongoskin.db('mongodb://'+config.dbUser+':'+config.dbPass+'@'+config.dbIp+':'+config.dbPort+'/'
+      +req.params.distrib+'-database?authSource='+req.params.distrib+'-database', {safe:true});
+    var aggregationId = req.params.aggregationId;
+    var year = parseInt(req.params.year);
+    var month = parseInt(req.params.month);
+    var day = parseInt(req.params.day);
+    var referenceDayTime = new Date(year, month-1, day, 0).getTime();
+    db.collection('agcl')
+      .find({
+        "aggregationId": aggregationId,
+        "estadoProcesamiento": "PROCESADO_OK"
+      })
+      .toArray(function(e, results) {
+        if (e) return next(e);
+        db.close();
+        var cups = [];
+        if (results.length > 0) {
+          var result = results[0];
+          sortedCups = result.historicoDeCUPS.sort(function(a, b) {
+            var aTime = new Date(a.fechaInclusionRegistroEnAgcl).getTime();
+            var bTime = new Date(b.fechaInclusionRegistroEnAgcl).getTime();
+            return (aTime<bTime) ? -1 : ((aTime>bTime) ? 1 : 0)
+          });
+          sortedCups.forEach(function(doc) {
+            var docDateTime = new Date(doc.fechaInclusionRegistroEnAgcl).getTime();
+            if (docDateTime > referenceDayTime) {
+              return;
+            }
+            if (doc.tipoOperacion === 'E') {
+              cups.push([doc.cupsId, doc]);
+            } else {
+              var cupsCompare = cups.map(function(c) { return c[0]});
+              cups.splice(cupsCompare.indexOf(doc.cupsId), 1);
+            }
+          });
+        }
+
+        res.send(cups.map(function(c) {
+          var result = {};
+          result.cups = c[1].cupsId;
+          result.entrada = c[1].fechaInclusionRegistroEnAgcl;
+          return result;
+        }));
+      });
+  } catch (error){
+    console.error(error);
+    res.status(500).send(error);
+  }
+});
+
 
 /* POST input file to set to necesitaRevisionManual */
 router.post('/objeswoanswer/necesitarevisionmanual/:distrib/:id', function(req, res, next) {
