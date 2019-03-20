@@ -3,7 +3,7 @@
   <div class="panel-body">
     <div class="col-md-1">
       <label>Año</label>
-      <select class="form-control" ng-model="$ctrl.selected_year" ng-options="month for month in $ctrl.years" ng-change="$ctrl.changePeriod()"></select>
+      <select class="form-control" ng-model="$ctrl.selected_year" ng-options="year for year in $ctrl.years" ng-change="$ctrl.changePeriod()"></select>
     </div>
     <div class="col-md-1">
       <label>Mes</label>
@@ -23,11 +23,18 @@
       <div class="panel-body">
         <table ng-table="$ctrl.tableParams" class="table" show-filter="true">
           <tr class="animate" ng-repeat="content in $data">
+            <td style="vertical-align: middle;" title="'Tipo'" filter="{'tipoObjecion': 'text'}" sortable="'tipoObjecion'">
+              {{content.tipoObjecion}}
+            </td>
             <td style="vertical-align: middle;" title="'Agregacion/CUPS'" filter="{'reference': 'text'}" sortable="'reference'">
-              {{content.reference}}
+              <div style="width:220px;">
+                {{content.reference}}
+              </div>
             </td>
             <td style="vertical-align: middle;" title="'Inventario/ID_REE'" filter="{'aggregationId': 'text'}" sortable="'aggregationId'">
-              {{content.aggregationId}}
+              <div style="width:220px;">
+                {{content.aggregationId}}
+              </div>
             </td>
             <td style="vertical-align: middle;" title="'Motivo'" filter="{'motivo': 'text'}" sortable="'motivo'">
               {{content.motivo}}
@@ -40,6 +47,9 @@
             </td>
             <td style="vertical-align: middle;" title="'Propuesto'" filter="{'aePropuesto': 'text'}" sortable="'aePropuesto'">
               {{content.aePropuesto}}
+            </td>
+            <td style="vertical-align: middle;" title="'Relacionadas respondidas'">
+              {{content.idObjecionesDesagregadasRespondidas.length}} ({{content.idObjecionesDesagregadas.length}})
             </td>
           </tr>
         </table>

@@ -3,7 +3,7 @@
   <div class="panel-body">
     <div class="col-md-1">
       <label>Año</label>
-      <select class="form-control" ng-model="$ctrl.selected_year" ng-options="month for month in $ctrl.years" ng-change="$ctrl.changePeriod()"></select>
+      <select class="form-control" ng-model="$ctrl.selected_year" ng-options="year for year in $ctrl.years" ng-change="$ctrl.changePeriod()"></select>
     </div>
     <div class="col-md-1">
       <label>Mes</label>
@@ -24,7 +24,9 @@
         <table ng-table="$ctrl.tableParams" class="table" show-filter="true">
           <tr class="animate" ng-repeat="content in $data">
             <td style="vertical-align: middle;" title="'Agregacion/CUPS'" filter="{'reference': 'text'}" sortable="'reference'">
-              {{content.reference}}
+              <div style="width:220px;">
+                {{content.reference}}
+              </div>
             </td>
             <td style="vertical-align: middle;" title="'Total'" filter="{'total': 'number'}" sortable="'total'">
               {{content.total | number}}
