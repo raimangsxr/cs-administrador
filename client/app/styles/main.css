@@ -152,6 +152,7 @@ body {
 .fix-to-top {
   position: fixed;
   top: 1em;
+  width: inherit;
 }
 
 @media (min-width: 1400px){

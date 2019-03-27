@@ -1,0 +1,47 @@
+<div class="panel panel-info">
+  <div class="panel-heading"><h3 class="panel-title">Validaciones: {{$ctrl.cierresValidation.inputFileName}}</h3></div>
+  <div class="panel-body">
+
+    <div class="row vert-offset-top-1">
+      <div class="col-md-4 text-right"><strong>Tipo de CIERRES</strong></div>
+      <div class="col-md-8 text-left">
+        <div ng-if="$ctrl.cierresValidation.entradaParcial">Parcial</div>
+        <div ng-if="!$ctrl.cierresValidation.entradaParcial">Completo</div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-4 text-right" style="padding-top: 10px"><strong>Validación</strong></div>
+      <div class="col-md-8 text-left">
+        <div ng-if="$ctrl.cierresValidation.validacionCorrecta" class="bg-success text-success" style="padding: 10px">OK</div>
+        <div ng-if="!$ctrl.cierresValidation.validacionCorrecta" class="bg-danger text-danger" style="padding: 10px">ERROR</div>
+      </div>
+    </div>
+
+    <div class="row vert-offset-top-1">
+      <div class="col-md-6">
+        <div class="row">
+          <div class="col-md-12 text-left"><legend><h5>ACTIVA ENTRANTE</h5></legend></div>
+          <div class="col-md-7 text-right">Fichero de entrada:</div>
+          <div class="col-md-5 text-left">{{$ctrl.cierresValidation.totalEntradaFicheroAE|number}}</div>
+          <div class="col-md-7 text-right">Fichero + complet. CS:</div>
+          <div class="col-md-5 text-left">{{$ctrl.cierresValidation.totalEntradaCompletadaAE|number}}</div>
+          <div class="col-md-7 text-right">Salida CS:</div>
+          <div class="col-md-5 text-left">{{$ctrl.cierresValidation.totalSalidaAE|number}}</div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="row">
+          <div class="col-md-12 text-left"><legend><h5>ACTIVA SALIENTE</h5></legend></div>
+          <div class="col-md-7 text-right">Fichero de entrada:</div>
+          <div class="col-md-5 text-left">{{$ctrl.cierresValidation.totalEntradaFicheroAS|number}} kWh</div>
+          <div class="col-md-7 text-right">Fichero + complet. CS:</div>
+          <div class="col-md-5 text-left">{{$ctrl.cierresValidation.totalEntradaCompletadaAS|number}} kWh</div>
+          <div class="col-md-7 text-right">Salida CS:</div>
+          <div class="col-md-5 text-left">{{$ctrl.cierresValidation.totalSalidaAS|number}} kWh</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

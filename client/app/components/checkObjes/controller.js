@@ -186,15 +186,19 @@ angular.module('csAdministratorApp')
       function processObjes(objes, cupsAgg) {
         return objes.map(function(obje) {
           if (obje.tipoObjecion === 'AOBJEAGCL' ||
-              obje.tipoObjecion === '15AOBJEAGCL') {
+              obje.tipoObjecion === '15AOBJEAGCL' ||
+              obje.tipoObjecion === 'AREVAC') {
             obje.reference = obje.aggregationId;
             obje.aggregationId = obje.objecionID_REE;
             return obje;
           }
           obje.reference = obje.cups;
-          obje.aggregationId = cupsAgg.filter(function(cupsTuple) {
+          var aggs = cupsAgg.filter(function(cupsTuple) {
             return cupsTuple[0] === obje.cups;
-          })[0][1];
+          });
+          if (aggs.length > 0) {
+            obje.aggregationId = aggs[0][1];
+          }
           return obje;
         });
       }

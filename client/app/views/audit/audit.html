@@ -80,10 +80,13 @@
       </div>
     </div>
 
-    <!-- Timeline -->
-    <custom-timeline id="timeline" filename="selectedFile.filename" data="auditData" ng-show="auditData" class="col-md-5" set-class-when-at-top="fix-to-top">
-    </custom-timeline>
-    <!-- END Timeline -->
+    <div class="col-md-5">
+      <!-- Validations -->
+      <audit-validations ng-if="auditValidation" validations="auditValidation"></audit-validations>
+      <!-- Timeline -->
+      <custom-timeline id="timeline" filename="selectedFile.filename" data="auditData" ng-show="auditData" set-class-when-at-top="fix-to-top"></custom-timeline>
+      <!-- END Timeline -->
+    </div>
   </div>
 
 

@@ -44,7 +44,7 @@ angular.module('csAdministratorApp')
       OK: true,
       BAD2: true,
       PERFF: true,
-      BALD: false,
+      BALD: true,
       ACUM: true,
       AGCLACUM: true,
       ACUMAGREREOS2: true
@@ -78,15 +78,39 @@ angular.module('csAdministratorApp')
       $scope.idSelectedFile = index;
       $scope.selectedFile = file;
       $scope.error = false;
-      $http.get('http://'+$rootScope.serverConfig.host+':'+$rootScope.serverConfig.port+'/api/audit/'+$rootScope.distrib.alias+'/'+file.filename).then(
-        function(response){
+      getFileInfo(file).then(
+        function(results){
           playAnimations();
-          $scope.auditData = response.data;
+          $scope.auditData = results[0];
+          $scope.auditValidation = results[1][0] || null;
         }, function(error){
           console.log(error);
           $scope.error = true;
       });
     };
+
+    function getFileInfo(file) {
+      var deferred = $q.defer();
+      var fileAuditPromise = $http.get('http://'+$rootScope.serverConfig.host+':'+$rootScope.serverConfig.port+'/api/audit/'+$rootScope.distrib.alias+'/'+file.filename);
+      var fileValidationPromise = $http.get('http://'+$rootScope.serverConfig.host+':'+$rootScope.serverConfig.port+'/api/audit/validation/'+$rootScope.distrib.alias+'/'+file.filename);
+      fileAuditPromise.then(
+        function(results) {
+          $scope.fileInfoResults = results.data;
+          fileValidationPromise.then(
+            function(results) {
+              deferred.resolve([$scope.fileInfoResults, results.data]);
+            }, function(err) {
+              $log.info('Error getting validation info. Maybe the collection is not created yet.. Error: '+JSON.stringify(err));
+              deferred.resolve([$scope.fileInfoResults]);
+            }
+          );
+        },
+        function(err) {
+          deferred.reject(err);
+        }
+      );
+      return deferred.promise;
+    }
 
     $scope.refreshTable = function(){
       if(!$rootScope.distrib.alias)

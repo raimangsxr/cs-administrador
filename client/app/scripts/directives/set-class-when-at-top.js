@@ -11,7 +11,7 @@ angular.module('csAdministratorApp').directive('setClassWhenAtTop', function ($w
     restrict: 'A',
     link: function (scope, element, attrs) {
       var topClass = attrs.setClassWhenAtTop, // get CSS class from directive's attribute value
-        offsetTop = 400; // get element's offset top relative to document
+        offsetTop = 700; // get element's offset top relative to document
 
       $win.on('scroll', function (e) {
         if ($win.scrollTop() >= offsetTop) {

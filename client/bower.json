@@ -14,7 +14,8 @@
     "angular-bootstrap": "^2.4.0",
     "Bootflat": "^2.0.4",
     "angular-md5": "^0.1.10",
-    "SVG-Loaders": "svg-loaders#^1.0.2"
+    "SVG-Loaders": "svg-loaders#^1.0.2",
+    "bootstrap": "3.3.7"
   },
   "appPath": "app",
   "moduleName": "csAdministratorApp",
