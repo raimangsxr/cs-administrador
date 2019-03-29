@@ -75,6 +75,8 @@ angular.module('csAdministratorApp')
     };
 
     $scope.selectFile = function(file, index){
+      $scope.auditData = null;
+      $scope.auditValidation = null;
       $scope.idSelectedFile = index;
       $scope.selectedFile = file;
       $scope.error = false;
@@ -189,7 +191,7 @@ angular.module('csAdministratorApp')
     function playAnimations(){
       //Animations
       var list = angular.element(document.querySelector('#list'));
-      var timeline = angular.element(document.querySelector('#timeline'));
+      var timeline = angular.element(document.querySelector('#details'));
 
       if(!timeline.hasClass('animated')) { //First time
         list.removeClass('col-md-12');
