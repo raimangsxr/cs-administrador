@@ -16,7 +16,7 @@
     "mongodb": "^2.1.7",
     "mongoose": "^4.4.3",
     "mongoskin": "^2.0.3",
-    "morgan": "~1.6.1",
+    "morgan": "~1.10.0",
     "serve-favicon": "~2.3.0",
     "unbzip2-stream": "^1.0.8"
   }
