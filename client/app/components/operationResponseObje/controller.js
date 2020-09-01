@@ -81,6 +81,39 @@ angular.module('csAdministratorApp')
               }
             });
             break;
+          case "15OBJEINMERE":
+          case "OBJEINMERE":
+            modalInstance = $uibModal.open({
+              templateUrl: 'components/operationResponseObje/view_response_objeinmere.html',
+              controller: 'OperationResponseOBJEINMERECtrl',
+              size: 'md',
+              resolve: {
+                file: file
+              }
+            });
+            break;
+          case "15AOBJEAGRERE":
+          case "AOBJEAGRERE":
+            modalInstance = $uibModal.open({
+              templateUrl: 'components/operationResponseObje/view_response_aobjeagrere.html',
+              controller: 'OperationResponseAOBJEAGRERECtrl',
+              size: 'md',
+              resolve: {
+                file: file
+              }
+            });
+            break;
+          case "15AOBJECIL":
+          case "AOBJECIL":
+            modalInstance = $uibModal.open({
+              templateUrl: 'components/operationResponseObje/view_response_aobjecil.html',
+              controller: 'OperationResponseAOBJECILCtrl',
+              size: 'md',
+              resolve: {
+                file: file
+              }
+            });
+            break;
         }
 
         modalInstance.result.then(function(result){

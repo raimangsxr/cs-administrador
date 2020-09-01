@@ -11,7 +11,7 @@
  * Controller of the csAdministratorApp
  */
 angular.module('csAdministratorApp')
-  .controller('OperationResponseOBJEINMECtrl', ['$rootScope', '$scope', '$log', '$http', '$cookies', '$uibModal', '$uibModalInstance', '$q', 'file', function ($rootScope, $scope, $log, $http, $cookies, $uibModal, $uibModalInstance, $q, file) {
+  .controller('OperationResponseOBJEINMERECtrl', ['$rootScope', '$scope', '$log', '$http', '$cookies', '$uibModal', '$uibModalInstance', '$q', 'file', function ($rootScope, $scope, $log, $http, $cookies, $uibModal, $uibModalInstance, $q, file) {
 
     $scope.file = file;
     $scope.responses = {};
@@ -20,7 +20,7 @@ angular.module('csAdministratorApp')
       $uibModalInstance.close();
     };
 
-    _getAndParseOBJEINME(file).then(
+    _getAndParseOBJEINMERE(file).then(
       function (parsedFile){
         $scope.objes = parsedFile.metadata.details.filter(function(obje){
           return obje.motivo === '700' || obje.motivo === '800';
@@ -71,7 +71,7 @@ angular.module('csAdministratorApp')
     };
 
 
-    function _getAndParseOBJEINME(file){
+    function _getAndParseOBJEINMERE(file){
       var deferred = $q.defer();
       if(file.metadata.hasOwnProperty('details')) {
         deferred.resolve(file);
@@ -132,10 +132,10 @@ angular.module('csAdministratorApp')
               objeDocument.codNivelTension,
               obje.fechaInicio,
               obje.fechaFin,
-              obje.publicado, // AE publicado
-              obje.propuesto, // AE propuesto
-              null, // AS publicado
-              null, // AS propuesto
+              null, // AE publicado
+              null, // AE propuesto
+              obje.publicado, // AS publicado
+              obje.propuesto, // AS propuesto
               null, // R1 publicado
               null, // R1 propuesto
               null, // R2 publicado

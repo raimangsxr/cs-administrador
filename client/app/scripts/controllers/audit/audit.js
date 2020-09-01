@@ -275,10 +275,10 @@ angular.module('csAdministratorApp')
         function (response) {
           var fields = response.data.trim().split(';');
           file.details = {};
-          file.details.demand = parseInt(fields[15]);
-          file.details.adquisition = parseInt(fields[16]);
-          file.details.lost = parseInt(fields[17]);
-          file.details.lost_percent = parseFloat(fields[18]);
+          file.details.demand = parseInt(fields[24]);
+          file.details.adquisition = parseInt(fields[25]);
+          file.details.lost = parseInt(fields[26]);
+          file.details.lost_percent = parseFloat(fields[27]);
           _updateAudit(angular.copy(file));
           file.inputState = _parseBaldState(file);
           deferred.resolve(file);

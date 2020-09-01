@@ -11,7 +11,7 @@
  * Controller of the csAdministratorApp
  */
 angular.module('csAdministratorApp')
-  .controller('OperationResponseOBJEINMECtrl', ['$rootScope', '$scope', '$log', '$http', '$cookies', '$uibModal', '$uibModalInstance', '$q', 'file', function ($rootScope, $scope, $log, $http, $cookies, $uibModal, $uibModalInstance, $q, file) {
+  .controller('OperationResponseAOBJECILCtrl', ['$rootScope', '$scope', '$log', '$http', '$cookies', '$uibModal', '$uibModalInstance', '$q', 'file', function ($rootScope, $scope, $log, $http, $cookies, $uibModal, $uibModalInstance, $q, file) {
 
     $scope.file = file;
     $scope.responses = {};
@@ -20,16 +20,16 @@ angular.module('csAdministratorApp')
       $uibModalInstance.close();
     };
 
-    _getAndParseOBJEINME(file).then(
+    _getAndParseAOBJECIL(file).then(
       function (parsedFile){
         $scope.objes = parsedFile.metadata.details.filter(function(obje){
           return obje.motivo === '700' || obje.motivo === '800';
         });
         $scope.objes.forEach(function(obje){
-          $scope.responses[obje.cups] = {};
-          $scope.responses[obje.cups].aceptado = null;
-          $scope.responses[obje.cups].segundoComer = '9999';
-          $scope.responses[obje.cups].comentarioRespuesta = null;
+          $scope.responses[obje.cil] = {};
+          $scope.responses[obje.cil].aceptado = null;
+          $scope.responses[obje.cil].segundoComer = '9999';
+          $scope.responses[obje.cil].comentarioRespuesta = null;
         });
       },
       function (error){
@@ -42,7 +42,7 @@ angular.module('csAdministratorApp')
       delete file.link;
 
       var fileMetadataWithResponses = $scope.objes.map(function(obje){
-        var response = $scope.responses[obje.cups];
+        var response = $scope.responses[obje.cil];
         Object.assign(obje, response); // Mergeamos las propiedades de ambos
         return obje;
       });
@@ -71,7 +71,7 @@ angular.module('csAdministratorApp')
     };
 
 
-    function _getAndParseOBJEINME(file){
+    function _getAndParseAOBJECIL(file){
       var deferred = $q.defer();
       if(file.metadata.hasOwnProperty('details')) {
         deferred.resolve(file);
@@ -84,14 +84,19 @@ angular.module('csAdministratorApp')
             file_lines.forEach(function(line){
               var fields = line.trim().split(';');
               var obje_detail = {};
-              obje_detail.cups = fields[0];
-              obje_detail.fechaInicio = fields[1];
-              obje_detail.fechaFin = fields[2];
-              obje_detail.motivo = fields[3];
-              obje_detail.publicado = parseInt(fields[4]);
-              obje_detail.propuesto = parseInt(fields[5]);
-              obje_detail.comentario = fields[6];
-              obje_detail.objeAAutoObje = fields[7];
+              obje_detail.id_objecion = fields[0];
+              obje_detail.cil = fields[1];
+              obje_detail.fechaInicio = fields[2];
+              obje_detail.fechaFin = fields[3];
+              obje_detail.motivo = fields[4];
+              obje_detail.as_publicado = parseInt(fields[5]);
+              obje_detail.as_propuesto = parseInt(fields[6]);
+              obje_detail.r2_publicado = parseInt(fields[7]);
+              obje_detail.r2_propuesto = parseInt(fields[8]);
+              obje_detail.r3_publicado = parseInt(fields[9]);
+              obje_detail.r3_propuesto = parseInt(fields[10]);
+              obje_detail.comentario = fields[11];
+              obje_detail.objeAAutoObje = fields[12];
               file.metadata.details.push(obje_detail);
             });
             _updateInputFile(angular.copy(file));
@@ -119,29 +124,29 @@ angular.module('csAdministratorApp')
           var filename_fields = filename.split('_');
           var responseData = {};
           var responseObjesData = objesMetadata.map(function(obje){
-            var objeDocument = response.data.filter(function(doc) {return doc.cups === obje.cups})[0];
+            var objeDocument = response.data.filter(function(doc) {return doc.cil === obje.cil})[0];
             return [
               objeDocument._id,
               objeDocument.codDistribuidor,
               objeDocument.codTipoPunto,
               objeDocument.codComercializador,
-              objeDocument.cups,
+              objeDocument.cil,
               objeDocument.codProvincia,
               objeDocument.codTarifa,
               objeDocument.codDH,
               objeDocument.codNivelTension,
               obje.fechaInicio,
               obje.fechaFin,
-              obje.publicado, // AE publicado
-              obje.propuesto, // AE propuesto
-              null, // AS publicado
-              null, // AS propuesto
+              null, // AE publicado
+              null, // AE propuesto
+              obje.as_publicado, // AS publicado
+              obje.as_propuesto, // AS propuesto
               null, // R1 publicado
               null, // R1 propuesto
-              null, // R2 publicado
-              null, // R2 propuesto
-              null, // R3 publicado
-              null, // R3 propuesto
+              obje.r2_publicado, // R2 publicado
+              obje.r2_propuesto, // R2 propuesto
+              obje.r3_publicado, // R3 publicado
+              obje.r3_propuesto, // R3 propuesto
               null, // R4 publicado
               null, // R4 propuesto
               obje.motivo,
@@ -155,7 +160,7 @@ angular.module('csAdministratorApp')
           });
           var generateFiles = {};
           responseObjesData.forEach(function(obje){
-            var segundoComer = objesMetadata.filter(function(objeMeta){return obje.split(';')[4] === objeMeta.cups})[0].segundoComer;
+            var segundoComer = objesMetadata.filter(function(objeMeta){return obje.split(';')[4] === objeMeta.cil})[0].segundoComer;
             var responseFilename = [
                 'REINTEROBJEDISTRIB',
                 filename_fields[0],

@@ -101,14 +101,20 @@ angular.module('csAdministratorApp')
               obje.tipoObjecion === 'AUTOBJEINME' ||
               obje.tipoObjecion === '15AUTOBJEINME' ||
               obje.tipoObjecion === 'AOBJE2' ||
-              obje.tipoObjecion === '15AOBJE2'
+              obje.tipoObjecion === '15AOBJE2' ||
+              obje.tipoObjecion === 'OBJEINMERE' ||
+              obje.tipoObjecion === '15OBJEINMERE' ||
+              obje.tipoObjecion === 'AUTOBJEINMERE' ||
+              obje.tipoObjecion === '15AUTOBJEINMERE'
           })
-          .map(function(obje){return getCupsInventory(obje.cups)});
+          .map(function(obje){
+            return getCupsInventory(obje.cups.substring(0, 20));
+          });
         $q.all(neededCupsInventoryPromises).then(
           function(responsesData) {
             var cupsAgg = responsesData.map(function(cupsInventory){
               var cups = cupsInventory[0].cupsId;
-              var instant = $ctrl.content.filter(function(obje) { return obje.cups === cups})[0].fechaInicioObjecion;
+              var instant = $ctrl.content.filter(function(obje) { return obje.cups && obje.cups.substring(0, 20) === cups})[0].fechaInicioObjecion;
               return [cups, getAggFromCupsInventoryAndPeriod(cupsInventory, instant)];
             });
             var objes = processObjes($ctrl.content, cupsAgg);
@@ -131,7 +137,11 @@ angular.module('csAdministratorApp')
               obje.tipoObjecion === 'AUTOBJEINME' ||
               obje.tipoObjecion === '15AUTOBJEINME' ||
               obje.tipoObjecion === 'AOBJE2' ||
-              obje.tipoObjecion === '15AOBJE2'
+              obje.tipoObjecion === '15AOBJE2' ||
+              obje.tipoObjecion === 'OBJEINMERE' ||
+              obje.tipoObjecion === '15OBJEINMERE' ||
+              obje.tipoObjecion === 'AUTOBJEINMERE' ||
+              obje.tipoObjecion === '15AUTOBJEINMERE'
           })
           .map(function(obje){return getOBJEINMEisAnswered(obje.gridFileId)});
         $q.all(objeinmeInputFilePromises).then(
@@ -187,12 +197,14 @@ angular.module('csAdministratorApp')
         return objes.map(function(obje) {
           if (obje.tipoObjecion === 'AOBJEAGCL' ||
               obje.tipoObjecion === '15AOBJEAGCL' ||
+              obje.tipoObjecion === 'AOBJEAGRERE' ||
+              obje.tipoObjecion === '15AOBJEAGRERE' ||
               obje.tipoObjecion === 'AREVAC') {
-            obje.reference = obje.aggregationId;
+            obje.reference = obje.aggregationId.replace(/null/g, '');
             obje.aggregationId = obje.objecionID_REE;
             return obje;
           }
-          obje.reference = obje.cups;
+          obje.reference = obje.cups.substring(0, 20);
           var aggs = cupsAgg.filter(function(cupsTuple) {
             return cupsTuple[0] === obje.cups;
           });

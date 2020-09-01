@@ -23,6 +23,10 @@ angular.module('csAdministratorApp')
       BALD: true,
       ACUM: true,
       AGCLACUM: true,
+      MHCIL: true,
+      ACUMCIL: true,
+      EPFPF: true,
+      AGCLOS: true,
       ACUMAGREREOS2: true
     };
 

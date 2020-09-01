@@ -102,20 +102,20 @@ angular.module('csAdministratorApp')
                 file.metadata.details = [];
                 response.data.forEach(function(obje){
                   var file_line = file_map.filter(function(obj) { return obj.id_objecion === obje.objecionID_REE})[0];
-                  var aggFields = obje.aggregationId.substring(0, 22).split('_');
+                  var aggFields = obje.aggregationId.slice(0, -4).split('_');
                   var aggregationId = [aggFields[0], aggFields[2], aggFields[3], aggFields[4], aggFields[5], aggFields[6], aggFields[1]].join(';');
-                  var AOBJEAGCL_detail = {};
-                  AOBJEAGCL_detail.id_objecion = obje.objecionID_REE;
-                  AOBJEAGCL_detail.agregacion = aggregationId;
-                  AOBJEAGCL_detail.fechaInicio = file_line.fechaInicio;
-                  AOBJEAGCL_detail.fechaFin = file_line.fechaFin;
-                  AOBJEAGCL_detail.motivo = obje.motivo;
-                  AOBJEAGCL_detail.publicado = obje.aePublicado;
-                  AOBJEAGCL_detail.propuesto = obje.aePropuesto;
-                  AOBJEAGCL_detail.comentario = obje.comentarioEmisorObjecion;
-                  AOBJEAGCL_detail.objeAAutoObje = obje.autoObjecion;
-                  AOBJEAGCL_detail.necesitaRevisionManual = (obje.idObjecionesDesagregadas.length === 0 && obje.aceptacion === '' ) ? true : false;
-                  file.metadata.details.push(AOBJEAGCL_detail);
+                  var obje_detail = {};
+                  obje_detail.id_objecion = obje.objecionID_REE;
+                  obje_detail.agregacion = aggregationId;
+                  obje_detail.fechaInicio = file_line.fechaInicio;
+                  obje_detail.fechaFin = file_line.fechaFin;
+                  obje_detail.motivo = obje.motivo;
+                  obje_detail.publicado = obje.aePublicado;
+                  obje_detail.propuesto = obje.aePropuesto;
+                  obje_detail.comentario = obje.comentarioEmisorObjecion;
+                  obje_detail.objeAAutoObje = obje.autoObjecion;
+                  obje_detail.necesitaRevisionManual = (obje.idObjecionesDesagregadas.length === 0 && obje.respuesta === false );
+                  file.metadata.details.push(obje_detail);
                 });
                 _updateInputFile(angular.copy(file));
                 deferred.resolve(file);
@@ -146,8 +146,8 @@ angular.module('csAdministratorApp')
           var responseObjesData = objesMetadata.map(function(obje){
             var objeDocument = response.data.filter(function(doc) {
               var doc_agregacion = [doc.codDistribuidor, doc.codComercializador, doc.codNivelTension, doc.codTarifa, doc.codDH, doc.codTipoPunto, doc.codProvincia].join(';');
-              return doc_agregacion === obje.agregacion}
-            )[0];
+              return doc_agregacion === obje.agregacion;
+            })[0];
             return [
               objeDocument._id,
               objeDocument.codDistribuidor,
@@ -160,8 +160,18 @@ angular.module('csAdministratorApp')
               objeDocument.codNivelTension,
               obje.fechaInicio,
               obje.fechaFin,
-              obje.publicado,
-              obje.propuesto,
+              obje.publicado, // AE publicado
+              obje.propuesto, // AE propuesto
+              null, // AS publicado
+              null, // AS propuesto
+              null, // R1 publicado
+              null, // R1 propuesto
+              null, // R2 publicado
+              null, // R2 propuesto
+              null, // R3 publicado
+              null, // R3 propuesto
+              null, // R4 publicado
+              null, // R4 propuesto
               obje.motivo,
               obje.comentario,
               objeDocument.objecionID_REE,

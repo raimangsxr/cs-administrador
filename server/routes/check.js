@@ -195,7 +195,7 @@ router.get('/objeswoanswer/:distrib/:year/:month', function(req, res, next) {
           .find({
             "fechaInicioObjecion": {$gte: new Date(start_period)},
             "fechaFinObjecion": {$lte: new Date(end_period)},
-            "aceptacion": "",
+            "respuesta": false,
             $or: [
               {"objectionOmitted": false},
               {"objectionOmitted": {$exists: false}}

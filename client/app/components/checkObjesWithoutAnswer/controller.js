@@ -112,11 +112,15 @@ angular.module('csAdministratorApp')
             case '15AOBJE2':
             case '15OBJEINME':
             case 'OBJEINME':
+            case '15OBJEINMERE':
+            case 'OBJEINMERE':
               obje.objeObject = obje.cups;
               break;
             case '15AOBJEAGCL':
             case 'AOBJEAGCL':
-              obje.objeObject = obje.aggregationId;
+            case '15AOBJEAGRERE':
+            case 'AOBJEAGRERE':
+              obje.objeObject = obje.aggregationId.replace(/null/g, '');
               break;
             case 'AREVAC':
               obje.objeObject = (obje.codTipoPunto === '2') ? obje.cups : obje.aggregationId;
