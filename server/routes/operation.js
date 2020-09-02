@@ -36,7 +36,9 @@ router.get('/manual-objes-response-required/:distrib', function (req, res, next)
       + '/' + req.params.distrib + '-database?authSource=' + req.params.distrib + '-database', {safe: true});
     db.collection(config.inputFsCollectionName)
       .find({
-        $or: [{'metadata.fileType': 'OBJEINME'}, {'metadata.fileType': '15OBJEINME'}, {'metadata.fileType': 'AOBJEAGCL'}, {'metadata.fileType': '15AOBJEAGCL'}],
+        $or: [{'metadata.fileType': 'OBJEINME'}, {'metadata.fileType': '15OBJEINME'}, {'metadata.fileType': 'AOBJEAGCL'}, {'metadata.fileType': '15AOBJEAGCL'},
+              {'metadata.fileType': 'OBJEINMERE'}, {'metadata.fileType': '15OBJEINMERE'}, {'metadata.fileType': 'AOBJEAGRERE'}, {'metadata.fileType': '15AOBJEAGRERE'},
+              {'metadata.fileType': 'AOBJECIL'}, {'metadata.fileType': '15AOBJECIL'}],
         'metadata.necesitaRevisionManual': true,
         'metadata.fechaRevisionManual': {$exists: false}
       })

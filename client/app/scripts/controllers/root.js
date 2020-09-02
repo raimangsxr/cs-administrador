@@ -10,9 +10,9 @@
 angular.module('csAdministratorApp')
   .controller('RootCtrl', function ($rootScope, $window, $cookies) {
 
-
+    //$rootScope.serverConfig = {host: '192.168.11.5', port: 3000};
     //$rootScope.serverConfig = {host: '192.168.246.52', port: 9000};
-    $rootScope.serverConfig = {host: '192.168.11.5', port: 3000};
+    $rootScope.serverConfig = {host: '192.168.5.152', port: 9000};
 
 
     $rootScope.distribuidoras = [

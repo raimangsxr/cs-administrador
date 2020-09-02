@@ -82,8 +82,8 @@ angular.module('csAdministratorApp')
               var fields = line.trim().split(';');
               var result = {}
               result.id_objecion = fields[0];
-              result.fechaInicio = fields[8];
-              result.fechaFin = fields[9];
+              result.fechaInicio = fields[5];
+              result.fechaFin = fields[6];
               return result;
             });
             $http.get('http://' + $rootScope.serverConfig.host + ':' + $rootScope.serverConfig.port + '/api/query/objecion-intercambio-distribuidor/'+ $rootScope.distrib.alias + '/' + file._id).then(
@@ -99,8 +99,8 @@ angular.module('csAdministratorApp')
                   obje_detail.fechaInicio = file_line.fechaInicio;
                   obje_detail.fechaFin = file_line.fechaFin;
                   obje_detail.motivo = obje.motivo;
-                  obje_detail.publicado = obje.asPublicado;
-                  obje_detail.propuesto = obje.asPropuesto;
+                  obje_detail.publicado = obje.aePublicado; // debería ser asPublicado pero en el código existe este bug y como son archivos que desaparecerán, no se cambia
+                  obje_detail.propuesto = obje.aePropuesto; // debería ser asPublicado pero en el código existe este bug y como son archivos que desaparecerán, no se cambia
                   obje_detail.comentario = obje.comentarioEmisorObjecion;
                   obje_detail.objeAAutoObje = obje.autoObjecion;
                   obje_detail.necesitaRevisionManual = (obje.idObjecionesDesagregadas.length === 0 && obje.respuesta === false);
@@ -134,14 +134,14 @@ angular.module('csAdministratorApp')
           var responseData = {};
           var responseObjesData = objesMetadata.map(function(obje){
             var objeDocument = response.data.filter(function(doc) {
-              var doc_agregacion = [doc.codDistribuidor, doc.codComercializador, doc.codNivelTension, doc.codTarifa, doc.codDH, doc.codTipoPunto, doc.codProvincia].join(';');
-              return doc_agregacion === obje.agregacion;
+              var doc_agregacion = [doc.codDistribuidor, doc.codUnidadProgr, doc.codNivelTension, doc.codTarifa, doc.codDH, doc.codTipoPunto, doc.codProvincia].join(';');
+              return doc_agregacion === obje.agregacion.replace(/null/g, '');
             })[0];
             return [
               objeDocument._id,
               objeDocument.codDistribuidor,
               objeDocument.codTipoPunto,
-              objeDocument.codComercializador,
+              objeDocument.codUnidadProgr,
               null,
               objeDocument.codProvincia,
               objeDocument.codTarifa,
@@ -174,16 +174,10 @@ angular.module('csAdministratorApp')
           responseObjesData.forEach(function(obje){
             var obje_fields = obje.split(';')
             var agregacion = [obje_fields[1], obje_fields[3], obje_fields[8], obje_fields[6], obje_fields[7], obje_fields[2], obje_fields[5]].join(';');
-            var primerComer = obje_fields[3];
-            var segundoComer = objesMetadata.filter(function(objeMeta){
-              return agregacion === objeMeta.agregacion
-            })[0].segundoComer;
             var responseFilename = [
                 'REINTEROBJEDISTRIB',
                 filename_fields[0],
-                primerComer,
                 filename_fields[1],
-                segundoComer,
                 filename_fields[2],
                 new Date().getFullYear().toString()+((new Date().getMonth()+1<10)?'0'+(new Date().getMonth()+1).toString():(new Date().getMonth()+1).toString())+new Date().getDate().toString()
             ].join('_');
