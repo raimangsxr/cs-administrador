@@ -134,8 +134,10 @@ angular.module('csAdministratorApp')
           var responseData = {};
           var responseObjesData = objesMetadata.map(function(obje){
             var objeDocument = response.data.filter(function(doc) {
-              var doc_agregacion = [doc.codDistribuidor, doc.codUnidadProgr, doc.codNivelTension, doc.codTarifa, doc.codDH, doc.codTipoPunto, doc.codProvincia].join(';');
-              return doc_agregacion === obje.agregacion.replace(/null/g, '');
+              var doc_agregacion_vieja = [doc.codDistribuidor, doc.codComercializador, doc.codNivelTension, doc.codTarifa, doc.codDH, doc.codTipoPunto, doc.codProvincia].join(';');
+              var doc_agregacion_nueva = [doc.codDistribuidor, doc.codUnidadProgr, doc.codNivelTension, doc.codTarifa, doc.codDH, doc.codTipoPunto, doc.codProvincia].join(';');
+              var obje_agregacion = obje.agregacion.replace(/null/g, '');
+              return doc_agregacion_vieja === obje_agregacion || doc_agregacion_nueva === obje_agregacion;
             })[0];
             return [
               objeDocument._id,

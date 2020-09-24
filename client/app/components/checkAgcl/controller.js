@@ -11,6 +11,8 @@ angular.module('csAdministratorApp')
     },
     controller: function Controller ($rootScope, $scope, $http, $log, $q, NgTableParams) {
       var $ctrl = this;
+      $ctrl.aggregation = '0185_C_0972_E0_21_E1_5_D-C';
+      $ctrl.resultsLoaded = false;
 
 
       $scope.$on('distrib-changed', function(event, distrib) {
@@ -50,8 +52,11 @@ angular.module('csAdministratorApp')
               sorting: { cups: "asc" },
             }, {data: $ctrl.content});
             $ctrl.loading = false;
+            $ctrl.resultsLoaded = true;
           }, function(err){
             $log.error('Error getting Cups! - '+JSON.stringify(err));
+            $ctrl.loading = false;
+            $ctrl.resultsLoaded = true;
           }
         );
       }

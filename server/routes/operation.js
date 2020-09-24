@@ -18,6 +18,7 @@ router.post('/response-obje/:distrib', function (req, res, next) {
     });
     files.forEach(function(file){
       fs.writeFile(config.ftpRootDir+'/'+distrib+'/'+config.REINTEROBJEDISTRIB_DIR+'/'+file.filename, file.data, function (err) {
+      // fs.writeFile('/home/rromani/'+file.filename, file.data, function (err) {
         if (err) throw err;
         console.log("It's saved");
       });

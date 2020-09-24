@@ -1,0 +1,85 @@
+<div class="panel panel-default">
+  <div class="panel-heading"><h3 class="panel-title">Selecciona CUPS para visualizar su inventario histórico</h3></div>
+  <div class="panel-body">
+    <div class="col-md-3">
+      <label>CUPS</label>
+      <input class="form-control" ng-model="$ctrl.cups" type="text" />
+    </div>
+    <div class="col-md-1">
+      <label>Operaciones</label>
+      <button class="btn btn-block btn-primary" ng-click="$ctrl.query()">Buscar</button>
+    </div>
+  </div>
+</div>
+
+<div class="row" ng-show="!$ctrl.loading && !$ctrl.error && $ctrl.resultsLoaded">
+  <div class="col-md-12">
+    <div class="panel panel-primary">
+      <div class="panel-heading"><h3 class="panel-title">El CUPS {{$ctrl.cups}} tiene el siguiente inventario histórico ({{$ctrl.content.length}} cambios)</h3></div>
+      <div class="panel-body">
+        <table ng-table="$ctrl.tableParams" class="table" show-filter="true">
+          <tr class="animate" ng-repeat="content in $data">
+            <td class="text-center" style="vertical-align: middle; width: 220px;" title="'Fecha'" filter="{'fechaModificacion': 'text'}" sortable="'fechaModificacion'">
+              {{content.fechaModificacion}}
+            </td>
+            <td class="text-center" style="vertical-align: middle; width: 60px;" title="'Op.'" filter="{'tipoOperacion': 'text'}" sortable="'tipoOperacion'">
+              {{content.tipoOperacion}}
+            </td>
+            <td class="text-center" style="vertical-align: middle; width: 260px;" title="'Agregación'" filter="{'aggregationId': 'text'}" sortable="'aggregationId'">
+              {{content.aggregationId}}
+            </td>
+            <td class="text-center" style="vertical-align: middle; width: 70px;" title="'P1'" filter="{'periodo1': 'number'}" sortable="'periodo1'">
+              {{content.periodo1}}
+            </td>
+            <td class="text-center" style="vertical-align: middle; width: 70px;" title="'P2'" filter="{'periodo2': 'number'}" sortable="'periodo2'">
+              {{content.periodo2}}
+            </td>
+            <td class="text-center" style="vertical-align: middle; width: 70px;" title="'P3'" filter="{'periodo3': 'number'}" sortable="'periodo3'">
+              {{content.periodo3}}
+            </td>
+            <td class="text-center" style="vertical-align: middle; width: 70px;" title="'P4'" filter="{'periodo4': 'number'}" sortable="'periodo4'">
+              {{content.periodo4}}
+            </td>
+            <td class="text-center" style="vertical-align: middle; width: 70px;" title="'P5'" filter="{'periodo5': 'number'}" sortable="'periodo5'">
+              {{content.periodo5}}
+            </td>
+            <td class="text-center" style="vertical-align: middle; width: 70px;" title="'P6'" filter="{'periodo6': 'number'}" sortable="'periodo6'">
+              {{content.periodo6}}
+            </td>
+            <td class="text-center" style="vertical-align: middle; width: 80px;" title="'Teleg.'" filter="{'telegestion': 'text'}" sortable="'telegestion'">
+              {{content.telegestion}}
+            </td>
+            <td class="text-center" style="vertical-align: middle; width: 80px;" title="'CNAE'" filter="{'cnae': 'text'}" sortable="'cnae'">
+              {{content.cnae}}
+            </td>
+            <td class="text-center" style="vertical-align: middle; width: 90px;" title="'Prop. Eq.'" filter="{'propiedadEquipoMedida': 'text'}" sortable="'propiedadEquipoMedida'">
+              {{content.propiedadEquipoMedida}}
+            </td>
+            <td class="text-center" style="vertical-align: middle; width: 110px;" title="'T. suministro'" filter="{'tensionSuministro': 'text'}" sortable="'tensionSuministro'">
+              {{content.tensionSuministro}}
+            </td>
+            <td class="text-center" style="vertical-align: middle; width: 80px;" title="'CIL'" filter="{'cil': 'text'}" sortable="'cil'">
+              {{content.cil}}
+            </td>
+            <td class="text-center" style="vertical-align: middle; width: 80px;" title="'Tipo CIL'" filter="{'tipoCil': 'text'}" sortable="'tipoCil'">
+              {{content.tipoCil}}
+            </td>
+            <td class="text-center" style="vertical-align: middle; width: 100px;" title="'Inst. Auto. 2'" filter="{'tipoInstalacionAutoconsumo2': 'text'}" sortable="'tipoInstalacionAutoconsumo2'">
+              {{content.tipoInstalacionAutoconsumo2}}
+            </td>
+          </tr>
+        </table>
+        <div class="alert alert-danger animate" ng-show="$ctrl.content.length === 0">No hay CUPS en la agregación para la fecha indicada</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div ng-show="$ctrl.loading" class="col-md-12 vert-offset-top-6 vert-offset-bottom-2 text-center">
+  <img src="images/loader.gif" />
+  <p><strong>Procesando ficheros..</strong></p>
+</div>
+
+<div ng-show="!$ctrl.loading && $ctrl.error" class="col-md-12 vert-offset-top-6 vert-offset-bottom-2 text-center">
+  <div class="col-md-offset-3 col-md-6 alert alert-danger" role="alert">Se han producido errores en la carga de datos de BD</div>
+</div>

@@ -24,7 +24,7 @@
   </div>
 </div>
 
-<div class="row" ng-show="!$ctrl.loading && !$ctrl.error">
+<div class="row" ng-show="!$ctrl.loading && !$ctrl.error && $ctrl.resultsLoaded">
   <div class="col-md-offset-3 col-md-6">
     <div class="panel panel-primary">
       <div class="panel-heading"><h3 class="panel-title">La agregación '{{$ctrl.aggregation}}' contiene los siguientes CUPS ({{$ctrl.content.length}})</h3></div>
