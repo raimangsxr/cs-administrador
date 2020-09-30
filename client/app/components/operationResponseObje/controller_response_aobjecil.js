@@ -149,6 +149,8 @@ angular.module('csAdministratorApp')
               obje.r3_propuesto, // R3 propuesto
               null, // R4 publicado
               null, // R4 propuesto
+              obje.tipoDemanda | null, // tipoDemanda (= tipoAutoconsumo)
+              obje.magnitud | null, // magnitud
               obje.motivo,
               obje.comentario,
               null,

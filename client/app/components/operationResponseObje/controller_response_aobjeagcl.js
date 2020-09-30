@@ -91,7 +91,7 @@ angular.module('csAdministratorApp')
             var file_lines = fileResponse.data.trim().split('\n');
             file_map = file_lines.map(function(line){
               var fields = line.trim().split(';');
-              var result = {}
+              var result = {};
               result.id_objecion = fields[0];
               result.fechaInicio = fields[8];
               result.fechaFin = fields[9];
@@ -172,6 +172,8 @@ angular.module('csAdministratorApp')
               null, // R3 propuesto
               null, // R4 publicado
               null, // R4 propuesto
+              obje.tipoDemanda | null, // tipoDemanda (= tipoAutoconsumo)
+              obje.magnitud | null, // magnitud
               obje.motivo,
               obje.comentario,
               objeDocument.objecionID_REE,

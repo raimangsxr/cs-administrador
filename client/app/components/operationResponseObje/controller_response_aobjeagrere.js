@@ -18,7 +18,7 @@ angular.module('csAdministratorApp')
 
     _getAndParseAOBJEAGRERE(file).then(
       function (parsedFile){
-        $scope.objes = parsedFile.metadata.details.filter(function(obje){
+        $scope.objes = parsedFile.metadata.details.filter(function(obje) {
           return obje.necesitaRevisionManual;
         });
         $scope.objes.forEach(function(obje){
@@ -163,6 +163,8 @@ angular.module('csAdministratorApp')
               null, // R3 propuesto
               null, // R4 publicado
               null, // R4 propuesto
+              obje.tipoDemanda | null, // tipoDemanda (= tipoAutoconsumo)
+              obje.magnitud | null, // magnitud
               obje.motivo,
               obje.comentario,
               objeDocument.objecionID_REE,
