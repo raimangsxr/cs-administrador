@@ -98,7 +98,9 @@ angular.module('csAdministratorApp')
         $ctrl.loading = true;
         $ctrl.error = false;
         $q.all([upload(), query()]).then(
-          function([simelPeriods, csPeriods]){
+          function(results){
+            var simelPeriods = results[0];
+            var csPeriods = results[1];
             var savedPeriods = csPeriods.map(function(period) {
               return {
                 aggregation: period.aggregation,
