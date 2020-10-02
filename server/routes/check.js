@@ -317,6 +317,86 @@ router.get('/agcl/:distrib/:year/:month/:day/:aggregationId', function(req, res,
 });
 
 
+/* GET all aggregations periods */
+router.get('/agcl/:distrib', function(req, res, next) {
+  try {
+    var db = mongoskin.db('mongodb://'+config.dbUser+':'+config.dbPass+'@'+config.dbIp+':'+config.dbPort+'/'
+      +req.params.distrib+'-database?authSource='+req.params.distrib+'-database', {safe:true});
+    db.collection('agcl')
+      .find({})
+      .sort({"fechaInicioVigencia": 1})
+      .toArray(function(e, results) {
+        if (e) return next(e);
+        db.close();
+        var periods = _process_agcl_periods(results);
+        res.send(periods);
+      });
+  } catch (error){
+    console.error(error);
+    res.status(500).send(error);
+  }
+});
+
+
+/* GET aggregation periods with cups */
+router.get('/agcl/:distrib/:aggregationId', function(req, res, next) {
+  try{
+    var db = mongoskin.db('mongodb://'+config.dbUser+':'+config.dbPass+'@'+config.dbIp+':'+config.dbPort+'/'
+      +req.params.distrib+'-database?authSource='+req.params.distrib+'-database', {safe:true});
+    var aggregationId = req.params.aggregationId;
+    db.collection('agcl')
+      .find({"aggregationId": aggregationId})
+      .sort({"fechaInicioVigencia": 1})
+      .toArray(function(e, results) {
+        if (e) return next(e);
+        db.close();
+        var periods = _process_agcl_periods(results);
+        res.send(periods);
+      });
+  } catch (error){
+    console.error(error);
+    res.status(500).send(error);
+  }
+});
+
+function _process_agcl_periods(periods) {
+  return periods.map(function(period) {
+    var sortedCups = period.historicoDeCUPS.sort(function(a, b) {
+      var aTime = new Date(a.fechaInclusionRegistroEnAgcl).getTime();
+      var bTime = new Date(b.fechaInclusionRegistroEnAgcl).getTime();
+      return (aTime<bTime) ? -1 : ((aTime>bTime) ? 1 : 0)
+    });
+    var processedCups = [];
+    sortedCups.forEach(function(doc) {
+      if (doc.tipoOperacion === 'E') {
+        processedCups.push([doc.cupsId, doc]);
+      } else {
+        var cupsCompare = processedCups.map(function(c) { return c[0]});
+        processedCups.splice(cupsCompare.indexOf(doc.cupsId), 1);
+      }
+    });
+    return {
+      aggregation: period.aggregationId,
+      startDate: period.fechaInicioVigencia,
+      endDate: (period.fechaFinVigencia) ? period.fechaFinVigencia : new Date(3000, 0, 1).toISOString(),
+      cups: processedCups.map(function(cups) { return {
+        cups: cups[0],
+        date: cups[1].fechaInclusionRegistroEnAgcl
+      }}),
+      nCups: processedCups.length,
+      history: sortedCups.map(function(cupsHistory) {
+        return {
+          cups: cupsHistory.cupsId,
+          date: cupsHistory.fechaInclusionRegistroEnAgcl,
+          enter: cupsHistory.tipoOperacion === "E",
+          leave: cupsHistory.tipoOperacion === "S",
+        }
+      })
+    };
+  });
+}
+
+
 /* POST input file to set to necesitaRevisionManual */
 router.post('/objeswoanswer/necesitarevisionmanual/:distrib/:id', function(req, res, next) {
   try {

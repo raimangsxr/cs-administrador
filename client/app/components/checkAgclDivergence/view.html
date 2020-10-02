@@ -1,0 +1,73 @@
+<div class="panel panel-default">
+  <div class="panel-heading"><h3 class="panel-title">Sube un CSV de inventario del SIMEL y compara con el inventario del CS</h3></div>
+  <div class="panel-body">
+    <div class="col-md-5">
+      <label>Archivo CSV de inventario del SIMEL</label>
+      <input class="form-control" id="file" type="file" />
+    </div>
+    <div class="col-md-1">
+      <label>Operaciones</label>
+      <button class="btn btn-block btn-primary" ng-click="$ctrl.compare()">Comparar</button>
+    </div>
+  </div>
+</div>
+
+<div class="row" ng-show="!$ctrl.loading && !$ctrl.error && $ctrl.resultsLoaded">
+  <div class="col-md-9">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h3 class="panel-title">Visualizando los períodos de todas las agregaciones</h3>
+      </div>
+      <div class="panel-body">
+        <table ng-table="$ctrl.tableParams" class="table" show-filter="true">
+          <tr ng-class="{'green': content.valid}" class="animate" ng-repeat="content in $data">
+            <td class="text-center" style="vertical-align: middle; width: 250px;" title="'Agregación'" filter="{'aggregation': 'text'}" sortable="'aggregation'">
+              {{content.aggregation}}
+            </td>
+            <td class="text-center" style="vertical-align: middle; " title="'Inicio (CS)'" filter="{'startDateCs': 'text'}" sortable="'startDateCs'">
+              {{content.startDateCs}}
+            </td>
+            <td class="text-center" style="vertical-align: middle; " title="'Fin (CS)'" filter="{'endDateCs': 'text'}" sortable="'endDateCs'">
+              {{content.endDateCs}}
+            </td>
+            <td class="text-center" style="vertical-align: middle; " title="'Inicio (SIMEL)'" filter="{'startDateSimel': 'text'}" sortable="'startDateSimel'">
+              {{content.startDateSimel}}
+            </td>
+            <td class="text-center" style="vertical-align: middle; " title="'Fin (SIMEL)'" filter="{'endDateSimel': 'text'}" sortable="'endDateSimel'">
+              {{content.endDateSimel}}
+            </td>
+            <td class="text-center" style="vertical-align: middle; " title="'Corregir CS'">
+              <button ng-if="!content.valid && content.startDateSimel" class="green">A</button>
+              <button ng-if="!content.valid && content.endDateSimel" class="red">B</button>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h3 class="panel-title">Agregaciones con diferencias Cs-SIMEL</h3>
+      </div>
+      <div class="panel-body">
+        <table ng-table="$ctrl.tableNotValid" class="table">
+          <tr class="animate red" ng-repeat="content in $data">
+            <td class="text-center" style="vertical-align: middle; " title="'Agregación'" sortable="'aggregation'">
+              {{content.aggregation}}
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div ng-show="$ctrl.loading" class="col-md-12 vert-offset-top-6 vert-offset-bottom-2 text-center">
+  <img src="images/loader.gif" />
+  <p><strong>Procesando ficheros..</strong></p>
+</div>
+
+<div ng-show="!$ctrl.loading && $ctrl.error" class="col-md-12 vert-offset-top-6 vert-offset-bottom-2 text-center">
+  <div class="col-md-offset-3 col-md-6 alert alert-danger" role="alert">Se han producido errores en la carga de datos de BD</div>
+</div>

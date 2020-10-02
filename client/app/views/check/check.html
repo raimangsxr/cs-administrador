@@ -8,16 +8,18 @@
     </div>
   </div>
   <div class="col-md-12 filter_row">
-    <div class="col-md-4 text-right">
+    <div class="col-md-2 text-right">
       <label class="btn btn-default disabled">Comprobaciones disponibles</label>
     </div>
-    <div class="btn-group col-md-8">
+    <div class="btn-group col-md-10">
       <button class="btn btn-default" ng-click="check_selected = 1">Objeciones</button>
       <button class="btn btn-default" ng-click="check_selected = 2">CUPS por agregación</button>
       <button class="btn btn-default" ng-click="check_selected = 3">Inventario de CUPS</button>
-      <button class="btn btn-default" ng-click="check_selected = 4">Agregaciones de alta sin medida</button>
-      <button class="btn btn-default" ng-click="check_selected = 5">Medidas por agregación</button>
-      <button class="btn btn-default" ng-click="check_selected = 6">Objeciones sin respuesta</button>
+      <button class="btn btn-default" ng-click="check_selected = 4">Inventario de agregaciones</button>
+      <button class="btn btn-default" ng-click="check_selected = 5">Divergencias de agregaciones</button>
+      <button class="btn btn-default" ng-click="check_selected = 6">Agregaciones de alta sin medida</button>
+      <button class="btn btn-default" ng-click="check_selected = 7">Medidas por agregación</button>
+      <button class="btn btn-default" ng-click="check_selected = 8">Objeciones sin respuesta</button>
     </div>
   </div>
 
@@ -27,9 +29,11 @@
       <check-objes ng-if="check_selected == 1" distrib="distrib"></check-objes>
       <check-agcl ng-if="check_selected == 2" distrib="distrib"></check-agcl>
       <check-cups-inventory ng-if="check_selected == 3" distrib="distrib"></check-cups-inventory>
-      <check-ags-without-measure ng-if="check_selected == 4" distrib="distrib"></check-ags-without-measure>
-      <check-ags-measure ng-if="check_selected == 5" distrib="distrib"></check-ags-measure>
-      <check-objes-without-answer ng-if="check_selected == 6" distrib="distrib"></check-objes-without-answer>
+      <check-agcl-inventory ng-if="check_selected == 4" distrib="distrib"></check-agcl-inventory>
+      <check-agcl-divergence ng-if="check_selected == 5" distrib="distrib"></check-agcl-divergence>
+      <check-ags-without-measure ng-if="check_selected == 6" distrib="distrib"></check-ags-without-measure>
+      <check-ags-measure ng-if="check_selected == 7" distrib="distrib"></check-ags-measure>
+      <check-objes-without-answer ng-if="check_selected == 8" distrib="distrib"></check-objes-without-answer>
 
     </div>
   </div>

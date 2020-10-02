@@ -133,6 +133,10 @@ body {
   opacity: 0.8;
 }
 
+.hand:hover{
+  cursor: pointer;
+}
+
 #footer{
   position:fixed;
   bottom:0;

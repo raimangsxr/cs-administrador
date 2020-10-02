@@ -1,0 +1,97 @@
+<div class="panel panel-default">
+  <div class="panel-heading"><h3 class="panel-title">Selecciona agregación para visualizar sus períodos</h3></div>
+  <div class="panel-body">
+    <div class="col-md-5">
+      <label>Agregación</label>
+      <input class="form-control" ng-model="$ctrl.aggregation" type="text" placeholder="Agregación.. o dejar vacio para buscar períodos de todas las agregaciones"/>
+    </div>
+    <div class="col-md-1">
+      <label>Operaciones</label>
+      <button class="btn btn-block btn-primary" ng-click="$ctrl.query()">Buscar</button>
+    </div>
+  </div>
+</div>
+
+<div class="row" ng-show="!$ctrl.loading && !$ctrl.error && $ctrl.resultsLoaded">
+  <div class="col-md-7">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h3 class="panel-title" ng-if="$ctrl.aggregation">La agregación {{$ctrl.aggregation}} tiene los siguientes períodos ({{$ctrl.content.length}})</h3>
+        <h3 class="panel-title" ng-if="!$ctrl.aggregation">Visualizando los períodos de todas las agregaciones</h3>
+      </div>
+      <div class="panel-body">
+        <table ng-table="$ctrl.tableParams" class="table" show-filter="true">
+          <tr ng-click="$ctrl.select(content.aggregation, content.startDate)"
+              ng-class="{'selected green': content.aggregation === $ctrl.selectedAggregation && content.startDate === $ctrl.selectedStartDate}"
+              class="animate hand" ng-repeat="content in $data">
+            <td class="text-center" style="vertical-align: middle; " title="'Agregación'" filter="{'aggregation': 'text'}" sortable="'aggregation'">
+              {{content.aggregation}}
+            </td>
+            <td class="text-center" style="vertical-align: middle; " title="'Inicio'" filter="{'startDate': 'text'}" sortable="'startDate'">
+              {{content.startDate}}
+            </td>
+            <td class="text-center" style="vertical-align: middle; " title="'Fin'" filter="{'endDate': 'text'}" sortable="'endDate'">
+              {{content.endDate}}
+            </td>
+            <td class="text-center" style="vertical-align: middle; " title="'CUPS contenidos'" filter="{'nCups': 'number'}" sortable="'nCups'">
+              {{content.nCups}}
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-5">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h3 class="panel-title" ng-if="$ctrl.selectedAggregation">CUPS en la agregación {{$ctrl.selectedAggregation}}</h3>
+        <h3 class="panel-title" ng-if="!$ctrl.selectedAggregation">CUPS en la agregación: No se ha seleccionado ninguna agregación</h3>
+      </div>
+      <div class="panel-body">
+        <table ng-table="$ctrl.tableCups" class="table" data-show-filter="true">
+          <tr class="animate" ng-repeat="content in $data">
+            <td class="text-center" style="vertical-align: middle; " title="'CUPS'" filter="{'cups': 'text'}" sortable="'cups'">
+              {{content.cups}}
+            </td>
+            <td class="text-center" style="vertical-align: middle; " title="'Entrada'" filter="{'date': 'text'}" sortable="'date'">
+              {{content.date}}
+            </td>
+          </tr>
+        </table>
+        <div class="alert alert-danger animate" ng-show="$ctrl.selectedObj.cups.length === 0">La agregación no tiene CUPS activos en este momento</div>
+      </div>
+    </div>
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h3 class="panel-title" ng-if="$ctrl.selectedAggregation">Histórico de CUPS de la agregación {{$ctrl.selectedAggregation}}</h3>
+        <h3 class="panel-title" ng-if="!$ctrl.selectedAggregation">Histórico de CUPS: No se ha seleccionado ninguna agregación</h3>
+      </div>
+      <div class="panel-body">
+        <table ng-table="$ctrl.tableCupsHistory" class="table" data-show-filter="true">
+          <tr ng-class="{'green': content.enter, 'red': content.leave}" class="animate" ng-repeat="content in $data">
+            <td class="text-center" style="vertical-align: middle; " title="'CUPS'" filter="{'cups': 'text'}" sortable="'cups'">
+              {{content.cups}}
+            </td>
+            <td class="text-center" style="vertical-align: middle; " title="'Fecha'" filter="{'date': 'text'}" sortable="'date'">
+              {{content.date}}
+            </td>
+            <td class="text-center" style="vertical-align: middle; " title="'E/S'" sortable="'enter'">
+              <i ng-if="content.enter" class="glyphicon glyphicon-plus"></i>
+              <i ng-if="content.leave" class="glyphicon glyphicon-minus"></i>
+            </td>
+          </tr>
+        </table>
+        <div class="alert alert-danger animate" ng-show="$ctrl.selectedObj.history.length === 0">La agregación no tiene histórico de CUPS</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div ng-show="$ctrl.loading" class="col-md-12 vert-offset-top-6 vert-offset-bottom-2 text-center">
+  <img src="images/loader.gif" />
+  <p><strong>Procesando ficheros..</strong></p>
+</div>
+
+<div ng-show="!$ctrl.loading && $ctrl.error" class="col-md-12 vert-offset-top-6 vert-offset-bottom-2 text-center">
+  <div class="col-md-offset-3 col-md-6 alert alert-danger" role="alert">Se han producido errores en la carga de datos de BD</div>
+</div>
