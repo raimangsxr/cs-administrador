@@ -29,9 +29,9 @@ module.exports = function(config) {
       'bower_components/angular-route/angular-route.js',
       'bower_components/ng-table/dist/ng-table.min.js',
       'bower_components/moment/moment.js',
-      'bower_components/momentjs/moment.js',
       'bower_components/bootstrap-daterangepicker/daterangepicker.js',
       'bower_components/bootstrap/dist/js/bootstrap.js',
+      'bower_components/momentjs/moment.js',
       'bower_components/ng-bs-daterangepicker/src/ng-bs-daterangepicker.js',
       'bower_components/angular-locale_es-es/angular-locale_es-es.js',
       'bower_components/Chart.js/Chart.js',
@@ -42,6 +42,7 @@ module.exports = function(config) {
       'bower_components/Bootflat/bootflat/js/jquery.fs.selecter.min.js',
       'bower_components/Bootflat/bootflat/js/jquery.fs.stepper.min.js',
       'bower_components/angular-md5/angular-md5.js',
+      'bower_components/remarkable-bootstrap-notify/bootstrap-notify.js',
       // endbower
       "app/scripts/**/*.js",
       "test/mock/**/*.js",

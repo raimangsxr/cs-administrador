@@ -376,6 +376,7 @@ function _process_agcl_periods(periods) {
       }
     });
     return {
+      id: period._id,
       aggregation: period.aggregationId,
       startDate: period.fechaInicioVigencia,
       endDate: (period.fechaFinVigencia) ? period.fechaFinVigencia : new Date(3000, 0, 1).toISOString(),
@@ -393,6 +394,53 @@ function _process_agcl_periods(periods) {
         }
       })
     };
+  });
+}
+
+
+router.put('/agcl/:distrib/change-start-date/:id', function(req, res, next) {
+  try {
+    var fileData = req.body;
+    updateAgclDate(req, res, next, true, false, new Date(fileData.date));
+  } catch (error){
+    console.error(error);
+    res.status(500).send(error);
+  }
+});
+
+
+router.put('/agcl/:distrib/change-end-date/:id', function(req, res, next) {
+  try {
+    var fileData = req.body;
+    updateAgclDate(req, res, next, false, true, new Date(fileData.date));
+  } catch (error){
+    console.error(error);
+    res.status(500).send(error);
+  }
+});
+
+
+function updateAgclDate(req, res, next, isStartDate, isEndDate, finalDate) {
+  // fechaInicioVigencia o fechaFinVigencia
+  if (!isStartDate && !isEndDate || isStartDate && isEndDate) {
+    res.status(500).send({"result": "error", "message": "Date must be StartDate or EndDate"});
+  }
+  var db = mongoskin.db('mongodb://' + config.dbUser + ':' + config.dbPass + '@' + config.dbIp + ':' + config.dbPort + '/'
+    + req.params.distrib + '-database?authSource=' + req.params.distrib + '-database', {safe: true});
+  db.collection('agcl').findById(req.params.id, function(e, agcl) {
+    if (e) return next(e);
+    var setExp;
+    if (isStartDate) {
+      setExp = {"fechaInicioVigenciaOriginal": agcl.fechaInicioVigencia, "fechaInicioVigencia": finalDate};
+    } else {
+      var agclEndDate = (agcl.fechaFinVigencia) ? agcl.fechaFinVigencia : null;
+      setExp = {"fechaFinVigenciaOriginal": agclEndDate, "fechaFinVigencia": finalDate};
+    }
+    db.collection('agcl').update({_id: agcl._id},{$set: setExp}, function (e) {
+      if (e) return next(e);
+      db.close();
+      res.status(200).json({"result": "ok"});
+    });
   });
 }
 

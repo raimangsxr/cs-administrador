@@ -2,8 +2,8 @@ module.exports = {
   /* Servers */
   dbUser: 'csadmin',
   dbPass: 'csp455',
-  // dbIp: '192.168.246.51',
-  dbIp: '192.168.5.151',
+  dbIp: '192.168.246.51',
+  // dbIp: '192.168.5.151',
   dbPort: '27017',
 
   auditCollectionName: 'entradaAuditoria',

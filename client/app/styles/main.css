@@ -97,6 +97,10 @@ body {
   color: white;
 }
 
+.lightgray {
+  background: lightgray;
+}
+
 .red, .red a{
   background-color: red;
   color: white;
