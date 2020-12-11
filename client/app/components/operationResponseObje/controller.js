@@ -50,71 +50,90 @@ angular.module('csAdministratorApp')
             $log.error(JSON.stringify(err));
           }
         );
-      }
+      };
 
 
 
 
       $ctrl.openModal = function (file) {
 
-        var modalInstance;
+        var modalInstance, templateUrl, controller;
         switch (file.metadata.fileType) {
-          case "15OBJEINME":
-          case "OBJEINME":
-            modalInstance = $uibModal.open({
-              templateUrl: 'components/operationResponseObje/view_response_objeinme.html',
-              controller: 'OperationResponseOBJEINMECtrl',
-              size: 'md',
-              resolve: {
-                file: file
-              }
-            });
+          case "15AOBJE2":
+          case "AOBJE2":
+            templateUrl = 'components/operationResponseObje/view_response_aobje2.html';
+            controller = 'OperationResponseAOBJE2Ctrl';
             break;
           case "15AOBJEAGCL":
           case "AOBJEAGCL":
-            modalInstance = $uibModal.open({
-              templateUrl: 'components/operationResponseObje/view_response_aobjeagcl.html',
-              controller: 'OperationResponseAOBJEAGCLCtrl',
-              size: 'md',
-              resolve: {
-                file: file
-              }
-            });
+            templateUrl = 'components/operationResponseObje/view_response_aobjeagcl.html';
+            controller = 'OperationResponseAOBJEAGCLCtrl';
             break;
-          case "15OBJEINMERE":
-          case "OBJEINMERE":
-            modalInstance = $uibModal.open({
-              templateUrl: 'components/operationResponseObje/view_response_objeinmere.html',
-              controller: 'OperationResponseOBJEINMERECtrl',
-              size: 'md',
-              resolve: {
-                file: file
-              }
-            });
+          case "15AOBJEAGRECL":
+          case "AOBJEAGRECL":
+            templateUrl = 'components/operationResponseObje/view_response_aobjeagrecl.html';
+            controller = 'OperationResponseAOBJEAGRECLCtrl';
             break;
           case "15AOBJEAGRERE":
           case "AOBJEAGRERE":
-            modalInstance = $uibModal.open({
-              templateUrl: 'components/operationResponseObje/view_response_aobjeagrere.html',
-              controller: 'OperationResponseAOBJEAGRERECtrl',
-              size: 'md',
-              resolve: {
-                file: file
-              }
-            });
+            templateUrl = 'components/operationResponseObje/view_response_aobjeagrere.html';
+            controller = 'OperationResponseAOBJEAGRERECtrl';
             break;
           case "15AOBJECIL":
           case "AOBJECIL":
-            modalInstance = $uibModal.open({
-              templateUrl: 'components/operationResponseObje/view_response_aobjecil.html',
-              controller: 'OperationResponseAOBJECILCtrl',
-              size: 'md',
-              resolve: {
-                file: file
-              }
-            });
+            templateUrl = 'components/operationResponseObje/view_response_aobjecil.html';
+            controller = 'OperationResponseAOBJECILCtrl';
+            break;
+          // case "15AREVCL":
+          // case "AREVCL":
+          //   templateUrl = 'components/operationResponseObje/view_response_arevcl.html';
+          //   controller = 'OperationResponseAREVCLCtrl';
+          //   break;
+          // case "15AREVAC":
+          // case "AREVAC":
+          //   templateUrl = 'components/operationResponseObje/view_response_arevac.html';
+          //   controller = 'OperationResponseAREVACCtrl';
+          //   break;
+          // case "15AREVAGRE":
+          // case "AREVAGRE":
+          //   templateUrl = 'components/operationResponseObje/view_response_arevagre.html';
+          //   controller = 'OperationResponseAREVAGRECtrl';
+          //   break;
+          // case "15AREVAE":
+          // case "AREVAE":
+          //   templateUrl = 'components/operationResponseObje/view_response_arevae.html';
+          //   controller = 'OperationResponseAREVAECtrl';
+          //   break;
+          // case "15AREVCIL":
+          // case "AREVCIL":
+          //   templateUrl = 'components/operationResponseObje/view_response_arevcil.html';
+          //   controller = 'OperationResponseAREVCILCtrl';
+          //   break;
+          case "15OBJEINME":
+          case "OBJEINME":
+            templateUrl = 'components/operationResponseObje/view_response_objeinme.html';
+            controller = 'OperationResponseOBJEINMECtrl';
+            break;
+          case "15OBJEINMERE":
+          case "OBJEINMERE":
+            templateUrl = 'components/operationResponseObje/view_response_objeinmere.html';
+            controller = 'OperationResponseOBJEINMERECtrl';
+            break;
+          case "15OBJEINCL":
+          case "OBJEINCL":
+            templateUrl = 'components/operationResponseObje/view_response_objeincl.html';
+            controller = 'OperationResponseOBJEINCLCtrl';
             break;
         }
+
+        modalInstance = $uibModal.open({
+          templateUrl: templateUrl,
+          controller: controller,
+          size: 'md',
+          resolve: {
+            file: file
+          }
+        });
 
         modalInstance.result.then(function(result){
           if(result) {
@@ -122,8 +141,9 @@ angular.module('csAdministratorApp')
             $log.info('Answer saved successfully');
             modalInstance.close(true);
           }
-          else
+          else {
             $log.info('Answer dismissed or failed');
+          }
         });
       };
 

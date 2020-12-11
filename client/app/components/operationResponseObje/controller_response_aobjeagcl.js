@@ -27,7 +27,7 @@ angular.module('csAdministratorApp')
       $uibModalInstance.close(true);
     };
 
-    _getAndParseAOBJEAGCL(file).then(
+    _getAndParseInputFile(file).then(
       function (parsedFile){
         $scope.objes = parsedFile.metadata.details.filter(function(obje){
           return obje.necesitaRevisionManual;
@@ -79,7 +79,7 @@ angular.module('csAdministratorApp')
     };
 
 
-    function _getAndParseAOBJEAGCL(file){
+    function _getAndParseInputFile(file){
       var deferred = $q.defer();
       if(file.metadata.hasOwnProperty('details')) {
         deferred.resolve(file);
@@ -114,7 +114,7 @@ angular.module('csAdministratorApp')
                   obje_detail.propuesto = obje.aePropuesto;
                   obje_detail.comentario = obje.comentarioEmisorObjecion;
                   obje_detail.objeAAutoObje = obje.autoObjecion;
-                  obje_detail.necesitaRevisionManual = (obje.idObjecionesDesagregadas.length === 0 && obje.respuesta === false );
+                  obje_detail.necesitaRevisionManual = (obje.idObjecionesDesagregadas.length === 0 && obje.respuesta === false && aggFields[2] !== '9999');
                   file.metadata.details.push(obje_detail);
                 });
                 _updateInputFile(angular.copy(file));
@@ -142,7 +142,6 @@ angular.module('csAdministratorApp')
       $http.get('http://' + $rootScope.serverConfig.host + ':' + $rootScope.serverConfig.port + '/api/query/objecion-intercambio-distribuidor/'+ $rootScope.distrib.alias + '/' + fileId).then(
         function (response) {
           var filename_fields = filename.split('_');
-          var responseData = {};
           var responseObjesData = objesMetadata.map(function(obje){
             var objeDocument = response.data.filter(function(doc) {
               var doc_agregacion = [doc.codDistribuidor, doc.codComercializador, doc.codNivelTension, doc.codTarifa, doc.codDH, doc.codTipoPunto, doc.codProvincia].join(';');
@@ -185,11 +184,11 @@ angular.module('csAdministratorApp')
           });
           var generateFiles = {};
           responseObjesData.forEach(function(obje){
-            var obje_fields = obje.split(';')
+            var obje_fields = obje.split(';');
             var agregacion = [obje_fields[1], obje_fields[3], obje_fields[8], obje_fields[6], obje_fields[7], obje_fields[2], obje_fields[5]].join(';');
             var primerComer = obje_fields[3];
             var segundoComer = objesMetadata.filter(function(objeMeta){
-              return agregacion === objeMeta.agregacion
+              return agregacion === objeMeta.agregacion;
             })[0].segundoComer;
             var responseFilename = [
                 'REINTEROBJEDISTRIB',

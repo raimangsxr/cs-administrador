@@ -1,6 +1,17 @@
+/**
+ * Created by rromani on 21/02/18.
+ */
+'use strict';
 
+/**
+ * @ngdoc function
+ * @name csAdministratorApp.controller:DetailBaldCtrl
+ * @description
+ * # AuditCtrl
+ * Controller of the csAdministratorApp
+ */
 angular.module('csAdministratorApp')
-  .controller('OperationResponseAOBJEAGRERECtrl', ['$rootScope', '$scope', '$log', '$http', '$cookies', '$uibModal', '$uibModalInstance', '$q', 'file', function ($rootScope, $scope, $log, $http, $cookies, $uibModal, $uibModalInstance, $q, file) {
+  .controller('OperationResponseAOBJEAGRECLCtrl', ['$rootScope', '$scope', '$log', '$http', '$cookies', '$uibModal', '$uibModalInstance', '$q', 'file', function ($rootScope, $scope, $log, $http, $cookies, $uibModal, $uibModalInstance, $q, file) {
 
     $scope.file = file;
     $scope.responses = {};
@@ -18,7 +29,7 @@ angular.module('csAdministratorApp')
 
     _getAndParseInputFile(file).then(
       function (parsedFile){
-        $scope.objes = parsedFile.metadata.details.filter(function(obje) {
+        $scope.objes = parsedFile.metadata.details.filter(function(obje){
           return obje.necesitaRevisionManual;
         });
         $scope.objes.forEach(function(obje){
@@ -82,8 +93,8 @@ angular.module('csAdministratorApp')
               var fields = line.trim().split(';');
               var result = {};
               result.id_objecion = fields[0];
-              result.fechaInicio = fields[5];
-              result.fechaFin = fields[6];
+              result.fechaInicio = fields[9];
+              result.fechaFin = fields[10];
               return result;
             });
             $http.get('http://' + $rootScope.serverConfig.host + ':' + $rootScope.serverConfig.port + '/api/query/objecion-intercambio-distribuidor/'+ $rootScope.distrib.alias + '/' + file._id).then(
@@ -99,8 +110,8 @@ angular.module('csAdministratorApp')
                   obje_detail.fechaInicio = file_line.fechaInicio;
                   obje_detail.fechaFin = file_line.fechaFin;
                   obje_detail.motivo = obje.motivo;
-                  obje_detail.publicado = obje.aePublicado; // debería ser asPublicado pero en el código existe este bug y como son archivos que desaparecerán, no se cambia
-                  obje_detail.propuesto = obje.aePropuesto; // debería ser asPublicado pero en el código existe este bug y como son archivos que desaparecerán, no se cambia
+                  obje_detail.publicado = obje.aePublicado;
+                  obje_detail.propuesto = obje.aePropuesto;
                   obje_detail.comentario = obje.comentarioEmisorObjecion;
                   obje_detail.objeAAutoObje = obje.autoObjecion;
                   obje_detail.necesitaRevisionManual = (obje.idObjecionesDesagregadas.length === 0 && obje.respuesta === false && aggFields[2] !== '9999');
@@ -133,16 +144,14 @@ angular.module('csAdministratorApp')
           var filename_fields = filename.split('_');
           var responseObjesData = objesMetadata.map(function(obje){
             var objeDocument = response.data.filter(function(doc) {
-              var doc_agregacion_vieja = [doc.codDistribuidor, doc.codComercializador, doc.codNivelTension, doc.codTarifa, doc.codDH, doc.codTipoPunto, doc.codProvincia].join(';');
-              var doc_agregacion_nueva = [doc.codDistribuidor, doc.codUnidadProgr, doc.codNivelTension, doc.codTarifa, doc.codDH, doc.codTipoPunto, doc.codProvincia].join(';');
-              var obje_agregacion = obje.agregacion.replace(/null/g, '');
-              return doc_agregacion_vieja === obje_agregacion || doc_agregacion_nueva === obje_agregacion;
+              var doc_agregacion = [doc.codDistribuidor, doc.codComercializador, doc.codNivelTension, doc.codTarifa, doc.codDH, doc.codTipoPunto, doc.codProvincia].join(';');
+              return doc_agregacion === obje.agregacion;
             })[0];
             return [
               objeDocument._id,
               objeDocument.codDistribuidor,
               objeDocument.codTipoPunto,
-              objeDocument.codUnidadProgr,
+              objeDocument.codComercializador,
               null,
               objeDocument.codProvincia,
               objeDocument.codTarifa,
@@ -150,10 +159,10 @@ angular.module('csAdministratorApp')
               objeDocument.codNivelTension,
               obje.fechaInicio,
               obje.fechaFin,
-              null, // AE publicado
-              null, // AE propuesto
-              obje.publicado, // AS publicado
-              obje.propuesto, // AS propuesto
+              obje.publicado, // AE publicado
+              obje.propuesto, // AE propuesto
+              null, // AS publicado
+              null, // AS propuesto
               null, // R1 publicado
               null, // R1 propuesto
               null, // R2 publicado
@@ -175,10 +184,18 @@ angular.module('csAdministratorApp')
           });
           var generateFiles = {};
           responseObjesData.forEach(function(obje){
+            var obje_fields = obje.split(';');
+            var agregacion = [obje_fields[1], obje_fields[3], obje_fields[8], obje_fields[6], obje_fields[7], obje_fields[2], obje_fields[5]].join(';');
+            var primerComer = obje_fields[3];
+            var segundoComer = objesMetadata.filter(function(objeMeta){
+              return agregacion === objeMeta.agregacion;
+            })[0].segundoComer;
             var responseFilename = [
                 'REINTEROBJEDISTRIB',
                 filename_fields[0],
+                primerComer,
                 filename_fields[1],
+                segundoComer,
                 filename_fields[2],
                 new Date().getFullYear().toString()+((new Date().getMonth()+1<10)?'0'+(new Date().getMonth()+1).toString():(new Date().getMonth()+1).toString())+new Date().getDate().toString()
             ].join('_');
@@ -207,7 +224,7 @@ angular.module('csAdministratorApp')
             function(err){
               $log.error(JSON.stringify(err));
             }
-          )
+          );
         }, function (err) {
           $log.error(JSON.stringify(err));
         });

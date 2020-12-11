@@ -20,7 +20,7 @@ angular.module('csAdministratorApp')
       $uibModalInstance.close();
     };
 
-    _getAndParseAOBJECIL(file).then(
+    _getAndParseInputFile(file).then(
       function (parsedFile){
         $scope.objes = parsedFile.metadata.details.filter(function(obje){
           return obje.motivo === '700' || obje.motivo === '800';
@@ -71,7 +71,7 @@ angular.module('csAdministratorApp')
     };
 
 
-    function _getAndParseAOBJECIL(file){
+    function _getAndParseInputFile(file){
       var deferred = $q.defer();
       if(file.metadata.hasOwnProperty('details')) {
         deferred.resolve(file);
@@ -122,7 +122,6 @@ angular.module('csAdministratorApp')
       $http.get('http://' + $rootScope.serverConfig.host + ':' + $rootScope.serverConfig.port + '/api/query/objecion-intercambio-distribuidor/'+ $rootScope.distrib.alias + '/' + fileId).then(
         function (response) {
           var filename_fields = filename.split('_');
-          var responseData = {};
           var responseObjesData = objesMetadata.map(function(obje){
             var objeDocument = response.data.filter(function(doc) {return doc.cil === obje.cil})[0];
             return [

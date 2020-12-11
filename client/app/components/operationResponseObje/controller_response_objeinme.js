@@ -20,7 +20,7 @@ angular.module('csAdministratorApp')
       $uibModalInstance.close();
     };
 
-    _getAndParseOBJEINME(file).then(
+    _getAndParseInputFile(file).then(
       function (parsedFile){
         $scope.objes = parsedFile.metadata.details.filter(function(obje){
           return obje.motivo === '700' || obje.motivo === '800';
@@ -71,7 +71,7 @@ angular.module('csAdministratorApp')
     };
 
 
-    function _getAndParseOBJEINME(file){
+    function _getAndParseInputFile(file){
       var deferred = $q.defer();
       if(file.metadata.hasOwnProperty('details')) {
         deferred.resolve(file);
