@@ -134,7 +134,7 @@ angular.module('csAdministratorApp')
           var responseObjesData = objesMetadata.map(function(obje){
             var objeDocument = response.data.filter(function(doc) {
               var doc_agregacion_vieja = [doc.codDistribuidor, doc.codComercializador, doc.codNivelTension, doc.codTarifa, doc.codDH, doc.codTipoPunto, doc.codProvincia].join(';');
-              var doc_agregacion_nueva = [doc.codDistribuidor, doc.codUnidadProgr, doc.codNivelTension, doc.codTarifa, doc.codDH, doc.codTipoPunto, doc.codProvincia].join(';');
+              var doc_agregacion_nueva = [doc.codDistribuidor, doc.codComercializador, doc.codNivelTension, doc.codTarifa, doc.codDH, doc.codTipoPunto, doc.codProvincia].join(';');
               var obje_agregacion = obje.agregacion.replace(/null/g, '');
               return doc_agregacion_vieja === obje_agregacion || doc_agregacion_nueva === obje_agregacion;
             })[0];
@@ -142,7 +142,7 @@ angular.module('csAdministratorApp')
               objeDocument._id,
               objeDocument.codDistribuidor,
               objeDocument.codTipoPunto,
-              objeDocument.codUnidadProgr,
+              objeDocument.codComercializador,
               null,
               objeDocument.codProvincia,
               objeDocument.codTarifa,
@@ -162,8 +162,8 @@ angular.module('csAdministratorApp')
               null, // R3 propuesto
               null, // R4 publicado
               null, // R4 propuesto
-              obje.tipoDemanda | null, // tipoDemanda (= tipoAutoconsumo)
-              obje.magnitud | null, // magnitud
+              objeDocument.tipoDemanda, // tipoDemanda (= tipoAutoconsumo)
+              objeDocument.magnitud, // magnitud
               obje.motivo,
               obje.comentario,
               objeDocument.objecionID_REE,
